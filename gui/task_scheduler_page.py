@@ -1,0 +1,513 @@
+import tkinter as tk
+from tkinter import ttk, messagebox
+
+from gui.dialogs import ProgressDialog, parse_json_output, show_error, show_info
+from gui.i18n import tr
+from gui.main_window import ShellResult, run_shell_async
+
+
+SCHEDULE_TYPES = ("Every N minutes", "Hourly", "Daily", "Weekly", "Monthly")
+DAY_OPTIONS = [
+    ("Sunday", "0"),
+    ("Monday", "1"),
+    ("Tuesday", "2"),
+    ("Wednesday", "3"),
+    ("Thursday", "4"),
+    ("Friday", "5"),
+    ("Saturday", "6"),
+]
+
+
+def normalize_schedule_type(value: str) -> str:
+    text = (value or "").strip().lower().replace("-", " ").replace("_", " ")
+    if text in {"every n minutes", "every few minutes"}:
+        return "every_n_minutes"
+    if text == "hourly":
+        return "hourly"
+    if text == "daily":
+        return "daily"
+    if text == "weekly":
+        return "weekly"
+    if text == "monthly":
+        return "monthly"
+    return text
+
+
+def day_name(value: str) -> str:
+    mapping = {
+        "0": tr("Sunday"),
+        "1": tr("Monday"),
+        "2": tr("Tuesday"),
+        "3": tr("Wednesday"),
+        "4": tr("Thursday"),
+        "5": tr("Friday"),
+        "6": tr("Saturday"),
+        "7": tr("Sunday"),
+    }
+    return mapping.get(str(value).strip(), tr("Unknown"))
+
+
+def format_clock(hour: str, minute: str) -> str:
+    try:
+        return f"{int(hour):02d}:{int(minute):02d}"
+    except (TypeError, ValueError):
+        return f"{hour}:{minute}"
+
+
+def describe_schedule_values(schedule_type: str, minute: str, hour: str, day_of_month: str, day_of_week: str, interval: str) -> str:
+    normalized = normalize_schedule_type(schedule_type)
+    if normalized == "every_n_minutes":
+        return tr("Every {interval} minutes", interval=interval or "?")
+    if normalized == "hourly":
+        return tr("Every hour at minute {minute}", minute=f"{int(minute):02d}" if str(minute).isdigit() else minute)
+    if normalized == "daily":
+        return tr("Every day at {time}", time=format_clock(hour, minute))
+    if normalized == "weekly":
+        return tr("Every week on {day} at {time}", day=day_name(day_of_week), time=format_clock(hour, minute))
+    if normalized == "monthly":
+        return tr("Every month on day {day} at {time}", day=day_of_month, time=format_clock(hour, minute))
+    return tr("Custom schedule")
+
+
+def describe_cron_expression(expr: str) -> str:
+    parts = (expr or "").split()
+    if len(parts) != 5:
+        return expr or tr("Unknown")
+    minute, hour, day_of_month, _month, day_of_week = parts
+    if minute.startswith("*/") and hour == "*" and day_of_month == "*" and day_of_week == "*":
+        return describe_schedule_values("Every N minutes", "0", "0", "1", "1", minute[2:] or "?")
+    if hour == "*" and day_of_month == "*" and day_of_week == "*":
+        return describe_schedule_values("Hourly", minute, "0", "1", "1", "5")
+    if day_of_month == "*" and day_of_week == "*":
+        return describe_schedule_values("Daily", minute, hour, "1", "1", "5")
+    if day_of_month == "*" and day_of_week != "*":
+        return describe_schedule_values("Weekly", minute, hour, "1", day_of_week, "5")
+    if day_of_month != "*" and day_of_week == "*":
+        return describe_schedule_values("Monthly", minute, hour, day_of_month, "1", "5")
+    return expr
+
+
+class ScheduledTaskDialog(tk.Toplevel):
+    def __init__(self, parent: tk.Widget, app) -> None:
+        super().__init__(parent)
+        self.app = app
+        self.title(self.app.tr("Add Scheduled Task"))
+        self.transient(parent)
+        self.grab_set()
+        self.geometry("700x560")
+        self.minsize(640, 520)
+        self.result: dict[str, str] | None = None
+
+        self.name_var = tk.StringVar(value=self.app.tr("My scheduled task"))
+        self.command_var = tk.StringVar(value="")
+        self.type_var = tk.StringVar(value="Daily")
+        self.interval_var = tk.StringVar(value="15")
+        self.minute_var = tk.StringVar(value="0")
+        self.hour_var = tk.StringVar(value="8")
+        self.day_of_week_var = tk.StringVar(value="1")
+        self.day_of_month_var = tk.StringVar(value="1")
+        self.preview_var = tk.StringVar(value="")
+
+        self._build()
+        self._bind_updates()
+        self._refresh_schedule_fields()
+        self._update_preview()
+
+    def _build(self) -> None:
+        body = ttk.Frame(self, padding=16)
+        body.pack(fill="both", expand=True)
+        body.columnconfigure(0, weight=1)
+
+        ttk.Label(body, text=self.app.tr("Add Scheduled Task"), style="Header.TLabel").grid(row=0, column=0, sticky="w")
+        ttk.Label(
+            body,
+            text=self.app.tr("Friendly scheduling for recurring reminders, scripts, and maintenance tasks."),
+            style="Subtitle.TLabel",
+        ).grid(row=1, column=0, sticky="w", pady=(2, 12))
+
+        info = ttk.LabelFrame(body, text=self.app.tr("Task details"), padding=12)
+        info.grid(row=2, column=0, sticky="ew")
+        info.columnconfigure(1, weight=1)
+
+        ttk.Label(info, text=self.app.tr("Task name")).grid(row=0, column=0, sticky="w", padx=(0, 10), pady=6)
+        name_entry = ttk.Entry(info, textvariable=self.name_var)
+        name_entry.grid(row=0, column=1, sticky="ew", pady=6)
+
+        ttk.Label(info, text=self.app.tr("Command")).grid(row=1, column=0, sticky="w", padx=(0, 10), pady=6)
+        command_entry = ttk.Entry(info, textvariable=self.command_var)
+        command_entry.grid(row=1, column=1, sticky="ew", pady=6)
+        ttk.Label(
+            info,
+            text=self.app.tr("Paste a one-line command or script path. Example: bash ~/scripts/backup.sh"),
+            style="Subtitle.TLabel",
+        ).grid(row=2, column=1, sticky="w", pady=(0, 4))
+
+        schedule = ttk.LabelFrame(body, text=self.app.tr("Schedule"), padding=12)
+        schedule.grid(row=3, column=0, sticky="ew", pady=(12, 0))
+        schedule.columnconfigure(1, weight=1)
+
+        ttk.Label(schedule, text=self.app.tr("Schedule type")).grid(row=0, column=0, sticky="w", padx=(0, 10), pady=6)
+        self.type_combo = ttk.Combobox(schedule, textvariable=self.type_var, values=SCHEDULE_TYPES, state="readonly")
+        self.type_combo.grid(row=0, column=1, sticky="ew", pady=6)
+        ttk.Label(
+            schedule,
+            text=self.app.tr("Choose a simple repeat pattern, then fill in only the time fields you need."),
+            style="Subtitle.TLabel",
+        ).grid(row=1, column=1, sticky="w", pady=(0, 6))
+
+        self.schedule_rows: dict[str, tuple[tk.Widget, tk.Widget]] = {}
+        self.schedule_order = ["interval", "minute", "hour", "day_of_week", "day_of_month"]
+
+        interval_label = ttk.Label(schedule, text=self.app.tr("Repeat every N minutes"))
+        interval_input = ttk.Combobox(schedule, textvariable=self.interval_var, values=("5", "10", "15", "30", "45"), state="readonly")
+        self.schedule_rows["interval"] = (interval_label, interval_input)
+
+        minute_label = ttk.Label(schedule, text=self.app.tr("Minute (0-59)"))
+        minute_input = ttk.Spinbox(schedule, from_=0, to=59, textvariable=self.minute_var, width=8)
+        self.schedule_rows["minute"] = (minute_label, minute_input)
+
+        hour_label = ttk.Label(schedule, text=self.app.tr("Hour (0-23)"))
+        hour_input = ttk.Spinbox(schedule, from_=0, to=23, textvariable=self.hour_var, width=8)
+        self.schedule_rows["hour"] = (hour_label, hour_input)
+
+        dow_label = ttk.Label(schedule, text=self.app.tr("Day of week"))
+        dow_input = ttk.Combobox(
+            schedule,
+            textvariable=self.day_of_week_var,
+            values=[value for _label, value in DAY_OPTIONS],
+            state="readonly",
+            width=8,
+        )
+        self.schedule_rows["day_of_week"] = (dow_label, dow_input)
+        self.day_of_week_name_var = tk.StringVar(value="")
+        ttk.Label(schedule, textvariable=self.day_of_week_name_var, style="Subtitle.TLabel").grid(row=6, column=1, sticky="w", pady=(0, 4))
+
+        dom_label = ttk.Label(schedule, text=self.app.tr("Day of month (1-31)"))
+        dom_input = ttk.Spinbox(schedule, from_=1, to=31, textvariable=self.day_of_month_var, width=8)
+        self.schedule_rows["day_of_month"] = (dom_label, dom_input)
+
+        self.preview_frame = ttk.LabelFrame(body, text=self.app.tr("Schedule preview"), padding=12)
+        self.preview_frame.grid(row=4, column=0, sticky="ew", pady=(12, 0))
+        self.preview_frame.columnconfigure(0, weight=1)
+        ttk.Label(self.preview_frame, textvariable=self.preview_var, wraplength=620).grid(row=0, column=0, sticky="w")
+
+        buttons = ttk.Frame(body)
+        buttons.grid(row=5, column=0, sticky="e", pady=(14, 0))
+        ttk.Button(buttons, text=self.app.tr("Cancel"), command=self.destroy).pack(side="right", padx=(8, 0))
+        ttk.Button(buttons, text=self.app.tr("Add Task"), command=self._submit, style="Accent.TButton").pack(side="right")
+
+        name_entry.focus_set()
+        self.bind("<Return>", lambda _event: self._submit())
+        self.bind("<Escape>", lambda _event: self.destroy())
+
+    def _bind_updates(self) -> None:
+        self.type_var.trace_add("write", lambda *_args: self._refresh_schedule_fields())
+        for variable in [
+            self.type_var,
+            self.interval_var,
+            self.minute_var,
+            self.hour_var,
+            self.day_of_week_var,
+            self.day_of_month_var,
+        ]:
+            variable.trace_add("write", lambda *_args: self._update_preview())
+
+    def _refresh_schedule_fields(self) -> None:
+        normalized = normalize_schedule_type(self.type_var.get())
+        visible_fields = {
+            "every_n_minutes": {"interval"},
+            "hourly": {"minute"},
+            "daily": {"minute", "hour"},
+            "weekly": {"minute", "hour", "day_of_week"},
+            "monthly": {"minute", "hour", "day_of_month"},
+        }.get(normalized, {"minute", "hour"})
+
+        base_row = 2
+        current_row = base_row
+        for key in self.schedule_order:
+            label, widget = self.schedule_rows[key]
+            if key in visible_fields:
+                label.grid(row=current_row, column=0, sticky="w", padx=(0, 10), pady=6)
+                widget.grid(row=current_row, column=1, sticky="w", pady=6)
+                current_row += 1
+            else:
+                label.grid_remove()
+                widget.grid_remove()
+
+        self.day_of_week_name_var.set(self.app.tr("Runs on: {day}", day=day_name(self.day_of_week_var.get())) if "day_of_week" in visible_fields else "")
+        self._update_preview()
+
+    def _update_preview(self) -> None:
+        self.preview_var.set(
+            self.app.tr(
+                "This task will run: {schedule}",
+                schedule=describe_schedule_values(
+                    self.type_var.get(),
+                    self.minute_var.get(),
+                    self.hour_var.get(),
+                    self.day_of_month_var.get(),
+                    self.day_of_week_var.get(),
+                    self.interval_var.get(),
+                ),
+            )
+        )
+        self.day_of_week_name_var.set(self.app.tr("Runs on: {day}", day=day_name(self.day_of_week_var.get())) if normalize_schedule_type(self.type_var.get()) == "weekly" else "")
+
+    def _submit(self) -> None:
+        values = {
+            "name": self.name_var.get().strip(),
+            "command": self.command_var.get().strip(),
+            "type": self.type_var.get().strip(),
+            "interval": self.interval_var.get().strip(),
+            "minute": self.minute_var.get().strip(),
+            "hour": self.hour_var.get().strip(),
+            "dow": self.day_of_week_var.get().strip(),
+            "dom": self.day_of_month_var.get().strip(),
+        }
+        if not values["name"] or not values["command"]:
+            messagebox.showwarning(self.app.tr("Missing information"), self.app.tr("Task name and command are required."), parent=self)
+            return
+        self.result = values
+        self.destroy()
+
+
+class TaskSchedulerPage(ttk.Frame):
+    def __init__(self, parent: tk.Widget, app) -> None:
+        super().__init__(parent, style="Page.TFrame", padding=18)
+        self.app = app
+        self.row_data: dict[str, dict] = {}
+        self.selected_task_name_var = tk.StringVar(value=self.app.tr("No scheduled task selected."))
+        self.selected_schedule_var = tk.StringVar(value="")
+        self.selected_cron_var = tk.StringVar(value="")
+        self.selected_command_var = tk.StringVar(value="")
+        self.selected_managed_var = tk.StringVar(value="")
+        self.selected_note_var = tk.StringVar(value=self.app.tr("Choose a scheduled task first."))
+        self._build()
+
+    def _build(self) -> None:
+        ttk.Label(self, text=self.app.tr("Scheduled Tasks"), style="Header.TLabel").pack(anchor="w")
+        ttk.Label(
+            self,
+            text=self.app.tr("Friendly scheduling for recurring reminders, scripts, and maintenance tasks."),
+            style="Subtitle.TLabel",
+        ).pack(anchor="w", pady=(2, 14))
+
+        controls = ttk.Frame(self)
+        controls.pack(fill="x", pady=(0, 10))
+        ttk.Button(controls, text=self.app.tr("Add Task"), command=self.add_task, style="Accent.TButton").pack(side="left")
+        self.remove_button = ttk.Button(controls, text=self.app.tr("Remove Task"), command=self.remove_task, style="Danger.TButton", state="disabled")
+        self.remove_button.pack(side="left", padx=(8, 0))
+        ttk.Button(controls, text=self.app.tr("Refresh"), command=self.load_jobs).pack(side="left", padx=(8, 0))
+        ttk.Button(controls, text=self.app.tr("Open Activity Log"), command=self.view_logs).pack(side="left", padx=(8, 0))
+
+        ttk.Label(
+            self,
+            text=self.app.tr("Tasks created here can be removed from this screen. Other cron jobs stay visible but read-only."),
+            style="Subtitle.TLabel",
+            wraplength=920,
+        ).pack(anchor="w", pady=(0, 10))
+
+        content = ttk.Frame(self)
+        content.pack(fill="both", expand=True)
+        content.columnconfigure(0, weight=3)
+        content.columnconfigure(1, weight=2)
+        content.rowconfigure(0, weight=1)
+
+        table_frame = ttk.Frame(content)
+        table_frame.grid(row=0, column=0, sticky="nsew", padx=(0, 12))
+        details_frame = ttk.Frame(content, style="Card.TFrame", padding=12)
+        details_frame.grid(row=0, column=1, sticky="nsew")
+        details_frame.columnconfigure(0, weight=1)
+
+        columns = ("task_name", "schedule_text", "managed")
+        self.tree = ttk.Treeview(table_frame, columns=columns, show="headings")
+        for column, heading, width in [
+            ("task_name", self.app.tr("Task name"), 220),
+            ("schedule_text", self.app.tr("Schedule"), 280),
+            ("managed", self.app.tr("Created here"), 110),
+        ]:
+            self.tree.heading(column, text=heading)
+            self.tree.column(column, width=width, anchor="w")
+        self.tree.bind("<<TreeviewSelect>>", lambda _event: self.update_action_states())
+        yscroll = ttk.Scrollbar(table_frame, orient="vertical", command=self.tree.yview)
+        self.tree.configure(yscrollcommand=yscroll.set)
+        self.tree.grid(row=0, column=0, sticky="nsew")
+        yscroll.grid(row=0, column=1, sticky="ns")
+        table_frame.rowconfigure(0, weight=1)
+        table_frame.columnconfigure(0, weight=1)
+
+        ttk.Label(details_frame, text=self.app.tr("Task details"), style="Header.TLabel").grid(row=0, column=0, sticky="w")
+        ttk.Label(details_frame, textvariable=self.selected_task_name_var).grid(row=1, column=0, sticky="w", pady=(8, 2))
+        ttk.Label(details_frame, text=self.app.tr("Schedule"), style="Subtitle.TLabel").grid(row=2, column=0, sticky="w", pady=(10, 0))
+        ttk.Label(details_frame, textvariable=self.selected_schedule_var, wraplength=340).grid(row=3, column=0, sticky="w")
+        ttk.Label(details_frame, text=self.app.tr("Raw cron expression"), style="Subtitle.TLabel").grid(row=4, column=0, sticky="w", pady=(10, 0))
+        ttk.Label(details_frame, textvariable=self.selected_cron_var, wraplength=340).grid(row=5, column=0, sticky="w")
+        ttk.Label(details_frame, text=self.app.tr("Command"), style="Subtitle.TLabel").grid(row=6, column=0, sticky="w", pady=(10, 0))
+        ttk.Label(details_frame, textvariable=self.selected_command_var, wraplength=340).grid(row=7, column=0, sticky="w")
+        ttk.Label(details_frame, text=self.app.tr("Created here"), style="Subtitle.TLabel").grid(row=8, column=0, sticky="w", pady=(10, 0))
+        ttk.Label(details_frame, textvariable=self.selected_managed_var, wraplength=340).grid(row=9, column=0, sticky="w")
+        ttk.Label(details_frame, textvariable=self.selected_note_var, style="Subtitle.TLabel", wraplength=340).grid(row=10, column=0, sticky="w", pady=(14, 0))
+
+    def on_show(self) -> None:
+        if not self.tree.get_children():
+            self.load_jobs()
+        self.update_action_states()
+
+    def selected_item_id(self) -> str:
+        selected = self.tree.selection()
+        return selected[0] if selected else ""
+
+    def update_action_states(self) -> None:
+        item = self.selected_item_id()
+        if not item:
+            self.remove_button.configure(state="disabled")
+            self._show_empty_details()
+            return
+        row = self.row_data.get(item, {})
+        managed = bool(row.get("managed"))
+        self.remove_button.configure(state="normal" if managed else "disabled")
+        self._show_details(row)
+
+    def _show_empty_details(self) -> None:
+        self.selected_task_name_var.set(self.app.tr("No scheduled task selected."))
+        self.selected_schedule_var.set("")
+        self.selected_cron_var.set("")
+        self.selected_command_var.set("")
+        self.selected_managed_var.set("")
+        self.selected_note_var.set(self.app.tr("Choose a scheduled task first."))
+
+    def _show_details(self, row: dict) -> None:
+        managed = bool(row.get("managed"))
+        self.selected_task_name_var.set(row.get("task_name", ""))
+        self.selected_schedule_var.set(row.get("schedule_text", ""))
+        self.selected_cron_var.set(row.get("cron_expr", ""))
+        self.selected_command_var.set(row.get("command", ""))
+        self.selected_managed_var.set(self.app.tr("Yes") if managed else self.app.tr("No"))
+        self.selected_note_var.set(
+            self.app.tr("This task can be removed here.") if managed else self.app.tr("This task was not created by this app, so it stays read-only here.")
+        )
+
+    def run_action(self, title: str, action: str, args: list[str], on_success=None, show_output: bool = True) -> None:
+        progress = ProgressDialog(self, title, self.app.tr("Updating scheduled tasks..."))
+
+        def done(result: ShellResult) -> None:
+            self.after(0, lambda: self._finish(progress, title, action, result, on_success, show_output))
+
+        run_shell_async("task_scheduler.sh", action, args, False, done)
+
+    def _finish(self, progress: ProgressDialog, title: str, action: str, result: ShellResult, on_success, show_output: bool) -> None:
+        progress.finish(result.success, result.stdout, result.stderr, show_output=show_output)
+        if result.success:
+            self.app.set_status(result.stdout.strip() or self.app.tr("Action completed."))
+            if on_success:
+                on_success(result)
+            else:
+                self.load_jobs(show_progress=False)
+            if action != "list_cron_jobs":
+                show_info(self, title, result.stdout)
+        else:
+            self.app.set_status(self.app.tr("Scheduled task action failed."))
+            show_error(self, title, result.stderr)
+
+    def load_jobs(self, show_progress: bool = True) -> None:
+        def populate(result: ShellResult) -> None:
+            rows = parse_json_output(result.stdout, [])
+            self.tree.delete(*self.tree.get_children())
+            self.row_data.clear()
+            for index, row in enumerate(rows):
+                row_copy = dict(row)
+                row_copy["schedule_text"] = describe_cron_expression(row.get("cron_expr", ""))
+                item_id = f"task-{index}"
+                self.row_data[item_id] = row_copy
+                self.tree.insert(
+                    "",
+                    "end",
+                    iid=item_id,
+                    values=(
+                        row_copy.get("task_name", ""),
+                        row_copy.get("schedule_text", ""),
+                        self.app.tr("Yes") if row_copy.get("managed") else self.app.tr("No"),
+                    ),
+                )
+            self.update_action_states()
+
+        if show_progress:
+            self.run_action(self.app.tr("Load scheduled tasks"), "list_cron_jobs", [], populate, show_output=False)
+        else:
+            run_shell_async("task_scheduler.sh", "list_cron_jobs", [], False, lambda result: self.after(0, lambda: populate(result)))
+
+    def add_task(self) -> None:
+        dialog = ScheduledTaskDialog(self, self.app)
+        self.wait_window(dialog)
+        values = dialog.result
+        if not values:
+            return
+
+        schedule_text = describe_schedule_values(
+            values["type"],
+            values["minute"],
+            values["hour"],
+            values["dom"],
+            values["dow"],
+            values["interval"],
+        )
+
+        def after_expr(result: ShellResult) -> None:
+            if not result.success:
+                show_error(self, self.app.tr("Invalid schedule"), result.stderr)
+                return
+            cron_expr = result.stdout.strip()
+            message = (
+                f"{self.app.tr('Add this scheduled task?')}\n\n"
+                f"{self.app.tr('Name')}: {values['name']}\n"
+                f"{self.app.tr('Schedule')}: {schedule_text}\n"
+                f"{self.app.tr('Raw cron expression')}: {cron_expr}\n"
+                f"{self.app.tr('Command')}: {values['command']}"
+            )
+            if messagebox.askyesno(self.app.tr("Confirm Scheduled Task"), message, parent=self):
+                self.run_action(self.app.tr("Add Scheduled Task"), "add_cron_job", [values["name"], cron_expr, values["command"]])
+
+        run_shell_async(
+            "task_scheduler.sh",
+            "build_cron_expression",
+            [values["type"], values["minute"], values["hour"], values["dom"], values["dow"], values["interval"]],
+            False,
+            lambda result: self.after(0, lambda: after_expr(result)),
+        )
+
+    def remove_task(self) -> None:
+        item = self.selected_item_id()
+        if not item:
+            messagebox.showwarning(self.app.tr("No task selected"), self.app.tr("Choose a scheduled task first."), parent=self)
+            return
+        row = self.row_data.get(item, {})
+        task_name = row.get("task_name", "")
+        managed = bool(row.get("managed"))
+        if not managed:
+            messagebox.showwarning(self.app.tr("Manual task"), self.app.tr("Only tasks created by this app can be removed here."), parent=self)
+            return
+        schedule_text = row.get("schedule_text", "")
+        if messagebox.askyesno(
+            self.app.tr("Remove Scheduled Task"),
+            f"{self.app.tr('Remove this scheduled task?')}\n\n{task_name}\n\n{self.app.tr('Schedule')}: {schedule_text}",
+            parent=self,
+        ):
+            self.run_action(self.app.tr("Remove Task"), "remove_cron_job", [task_name])
+
+    def view_logs(self) -> None:
+        log_path = "logs/sysadmin_gui.log"
+        try:
+            with open(log_path, "r", encoding="utf-8") as handle:
+                content = handle.read()[-12000:]
+        except FileNotFoundError:
+            content = self.app.tr("No log entries yet.")
+        window = tk.Toplevel(self)
+        window.title(self.app.tr("Activity Log"))
+        window.geometry("720x420")
+        text = tk.Text(window, wrap="word")
+        scroll = ttk.Scrollbar(window, orient="vertical", command=text.yview)
+        text.configure(yscrollcommand=scroll.set)
+        text.insert("1.0", content)
+        text.configure(state="disabled")
+        text.pack(side="left", fill="both", expand=True)
+        scroll.pack(side="right", fill="y")

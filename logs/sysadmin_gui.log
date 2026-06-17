@@ -1,0 +1,491 @@
+2026-06-15T17:24:11Z action=file.create_file status=succeeded detail=/tmp/tmp.XGFqNFhxWt/file.txt
+2026-06-15T17:24:11Z action=file.create_dir status=succeeded detail=/tmp/tmp.XGFqNFhxWt/folder
+2026-06-15T17:24:11Z action=file.rename_path status=succeeded detail=/tmp/tmp.XGFqNFhxWt/file.txt -> /tmp/tmp.XGFqNFhxWt/renamed.txt
+2026-06-15T17:24:11Z action=file.copy_path status=succeeded detail=/tmp/tmp.XGFqNFhxWt/renamed.txt -> /tmp/tmp.XGFqNFhxWt/copy.txt
+2026-06-15T17:24:11Z action=file.move_path status=succeeded detail=/tmp/tmp.XGFqNFhxWt/copy.txt -> /tmp/tmp.XGFqNFhxWt/moved.txt
+2026-06-15T17:24:11Z action=file.create_tar_gz status=succeeded detail=/tmp/tmp.XGFqNFhxWt/folder -> /tmp/tmp.XGFqNFhxWt/folder.tar.gz
+2026-06-15T17:24:12Z action=file.extract_tar_gz status=succeeded detail=/tmp/tmp.XGFqNFhxWt/folder.tar.gz -> /tmp/tmp.XGFqNFhxWt/tar_extract
+2026-06-15T17:24:12Z action=file.create_zip status=succeeded detail=/tmp/tmp.XGFqNFhxWt/folder -> /tmp/tmp.XGFqNFhxWt/folder.zip
+2026-06-15T17:24:12Z action=file.extract_zip status=succeeded detail=/tmp/tmp.XGFqNFhxWt/folder.zip -> /tmp/tmp.XGFqNFhxWt/zip_extract
+2026-06-15T17:24:12Z action=file.delete_path status=succeeded detail=/tmp/tmp.XGFqNFhxWt/moved.txt
+2026-06-15T17:24:12Z action=cron.add_cron_job status=succeeded detail=Demo Task
+2026-06-15T17:24:12Z action=cron.list_cron_jobs status=succeeded detail=listed jobs
+2026-06-15T17:24:12Z action=cron.remove_cron_job status=succeeded detail=Demo Task
+2026-06-15T17:24:52Z action=file.browse_folder status=succeeded detail=/home/duongduy
+2026-06-15T17:24:55Z action=cron.list_cron_jobs status=succeeded detail=listed jobs
+2026-06-15T17:25:02Z action=cron.list_cron_jobs status=succeeded detail=listed jobs
+2026-06-15T17:25:12Z action=file.browse_folder status=succeeded detail=/home/duongduy
+2026-06-15T17:26:14Z action=file.create_file status=succeeded detail=/tmp/tmp.KizhSVcy7D/file.txt
+2026-06-15T17:26:14Z action=file.create_dir status=succeeded detail=/tmp/tmp.KizhSVcy7D/folder
+2026-06-15T17:26:14Z action=file.rename_path status=succeeded detail=/tmp/tmp.KizhSVcy7D/file.txt -> /tmp/tmp.KizhSVcy7D/renamed.txt
+2026-06-15T17:26:14Z action=file.copy_path status=succeeded detail=/tmp/tmp.KizhSVcy7D/renamed.txt -> /tmp/tmp.KizhSVcy7D/copy.txt
+2026-06-15T17:26:14Z action=file.move_path status=succeeded detail=/tmp/tmp.KizhSVcy7D/copy.txt -> /tmp/tmp.KizhSVcy7D/moved.txt
+2026-06-15T17:26:14Z action=file.create_tar_gz status=succeeded detail=/tmp/tmp.KizhSVcy7D/folder -> /tmp/tmp.KizhSVcy7D/folder.tar.gz
+2026-06-15T17:26:14Z action=file.extract_tar_gz status=succeeded detail=/tmp/tmp.KizhSVcy7D/folder.tar.gz -> /tmp/tmp.KizhSVcy7D/tar_extract
+2026-06-15T17:26:14Z action=file.create_zip status=succeeded detail=/tmp/tmp.KizhSVcy7D/folder -> /tmp/tmp.KizhSVcy7D/folder.zip
+2026-06-15T17:26:14Z action=file.extract_zip status=succeeded detail=/tmp/tmp.KizhSVcy7D/folder.zip -> /tmp/tmp.KizhSVcy7D/zip_extract
+2026-06-15T17:26:14Z action=file.delete_path status=succeeded detail=/tmp/tmp.KizhSVcy7D/moved.txt
+2026-06-15T17:26:14Z action=cron.add_cron_job status=succeeded detail=Demo Task
+2026-06-15T17:26:14Z action=cron.list_cron_jobs status=succeeded detail=listed jobs
+2026-06-15T17:26:14Z action=cron.remove_cron_job status=succeeded detail=Demo Task
+2026-06-15T17:26:26Z action=file.create_file status=succeeded detail=/tmp/tmp.LnqfQKeYgF/file.txt
+2026-06-15T17:26:26Z action=file.create_dir status=succeeded detail=/tmp/tmp.LnqfQKeYgF/folder
+2026-06-15T17:26:26Z action=file.rename_path status=succeeded detail=/tmp/tmp.LnqfQKeYgF/file.txt -> /tmp/tmp.LnqfQKeYgF/renamed.txt
+2026-06-15T17:26:26Z action=file.copy_path status=succeeded detail=/tmp/tmp.LnqfQKeYgF/renamed.txt -> /tmp/tmp.LnqfQKeYgF/copy.txt
+2026-06-15T17:26:26Z action=file.move_path status=succeeded detail=/tmp/tmp.LnqfQKeYgF/copy.txt -> /tmp/tmp.LnqfQKeYgF/moved.txt
+2026-06-15T17:26:26Z action=file.create_tar_gz status=succeeded detail=/tmp/tmp.LnqfQKeYgF/folder -> /tmp/tmp.LnqfQKeYgF/folder.tar.gz
+2026-06-15T17:26:26Z action=file.extract_tar_gz status=succeeded detail=/tmp/tmp.LnqfQKeYgF/folder.tar.gz -> /tmp/tmp.LnqfQKeYgF/tar_extract
+2026-06-15T17:26:26Z action=file.create_zip status=succeeded detail=/tmp/tmp.LnqfQKeYgF/folder -> /tmp/tmp.LnqfQKeYgF/folder.zip
+2026-06-15T17:26:26Z action=file.extract_zip status=succeeded detail=/tmp/tmp.LnqfQKeYgF/folder.zip -> /tmp/tmp.LnqfQKeYgF/zip_extract
+2026-06-15T17:26:26Z action=file.delete_path status=succeeded detail=/tmp/tmp.LnqfQKeYgF/moved.txt
+2026-06-15T17:26:26Z action=cron.add_cron_job status=succeeded detail=Demo Task
+2026-06-15T17:26:26Z action=cron.list_cron_jobs status=succeeded detail=listed jobs
+2026-06-15T17:26:26Z action=cron.remove_cron_job status=succeeded detail=Demo Task
+2026-06-15T17:27:05Z action=file.create_file status=succeeded detail=/tmp/tmp.AO0paSmLTs/file.txt
+2026-06-15T17:27:05Z action=file.create_dir status=succeeded detail=/tmp/tmp.AO0paSmLTs/folder
+2026-06-15T17:27:05Z action=file.rename_path status=succeeded detail=/tmp/tmp.AO0paSmLTs/file.txt -> /tmp/tmp.AO0paSmLTs/renamed.txt
+2026-06-15T17:27:05Z action=file.copy_path status=succeeded detail=/tmp/tmp.AO0paSmLTs/renamed.txt -> /tmp/tmp.AO0paSmLTs/copy.txt
+2026-06-15T17:27:05Z action=file.move_path status=succeeded detail=/tmp/tmp.AO0paSmLTs/copy.txt -> /tmp/tmp.AO0paSmLTs/moved.txt
+2026-06-15T17:27:05Z action=file.create_tar_gz status=succeeded detail=/tmp/tmp.AO0paSmLTs/folder -> /tmp/tmp.AO0paSmLTs/folder.tar.gz
+2026-06-15T17:27:05Z action=file.extract_tar_gz status=succeeded detail=/tmp/tmp.AO0paSmLTs/folder.tar.gz -> /tmp/tmp.AO0paSmLTs/tar_extract
+2026-06-15T17:27:05Z action=file.create_zip status=succeeded detail=/tmp/tmp.AO0paSmLTs/folder -> /tmp/tmp.AO0paSmLTs/folder.zip
+2026-06-15T17:27:05Z action=file.extract_zip status=succeeded detail=/tmp/tmp.AO0paSmLTs/folder.zip -> /tmp/tmp.AO0paSmLTs/zip_extract
+2026-06-15T17:27:05Z action=file.delete_path status=succeeded detail=/tmp/tmp.AO0paSmLTs/moved.txt
+2026-06-15T17:27:05Z action=cron.add_cron_job status=succeeded detail=Demo Task
+2026-06-15T17:27:05Z action=cron.list_cron_jobs status=succeeded detail=listed jobs
+2026-06-15T17:27:05Z action=cron.remove_cron_job status=succeeded detail=Demo Task
+2026-06-15T17:27:36Z action=file.browse_folder status=succeeded detail=/home/duongduy
+2026-06-15T17:28:13Z action=file.browse_folder status=succeeded detail=/home/duongduy
+2026-06-16T12:21:12Z action=file.browse_folder status=succeeded detail=/home/duongduy
+2026-06-16T12:54:16Z action=file.create_file status=succeeded detail=/tmp/tmp.SJpo7Jjy67/file.txt
+2026-06-16T12:54:16Z action=file.create_dir status=succeeded detail=/tmp/tmp.SJpo7Jjy67/folder
+2026-06-16T12:54:16Z action=file.rename_path status=succeeded detail=/tmp/tmp.SJpo7Jjy67/file.txt -> /tmp/tmp.SJpo7Jjy67/renamed.txt
+2026-06-16T12:54:16Z action=file.copy_path status=succeeded detail=/tmp/tmp.SJpo7Jjy67/renamed.txt -> /tmp/tmp.SJpo7Jjy67/copy.txt
+2026-06-16T12:54:16Z action=file.move_path status=succeeded detail=/tmp/tmp.SJpo7Jjy67/copy.txt -> /tmp/tmp.SJpo7Jjy67/moved.txt
+2026-06-16T12:54:16Z action=file.create_tar_gz status=succeeded detail=/tmp/tmp.SJpo7Jjy67/folder -> /tmp/tmp.SJpo7Jjy67/folder.tar.gz
+2026-06-16T12:54:16Z action=file.extract_tar_gz status=succeeded detail=/tmp/tmp.SJpo7Jjy67/folder.tar.gz -> /tmp/tmp.SJpo7Jjy67/tar_extract
+2026-06-16T12:54:16Z action=file.create_zip status=succeeded detail=/tmp/tmp.SJpo7Jjy67/folder -> /tmp/tmp.SJpo7Jjy67/folder.zip
+2026-06-16T12:54:16Z action=file.extract_zip status=succeeded detail=/tmp/tmp.SJpo7Jjy67/folder.zip -> /tmp/tmp.SJpo7Jjy67/zip_extract
+2026-06-16T12:54:16Z action=file.delete_path status=mocked detail=/tmp/tmp.SJpo7Jjy67/moved.txt
+2026-06-16T12:54:16Z action=cron.add_cron_job status=succeeded detail=Demo Task
+2026-06-16T12:54:16Z action=cron.list_cron_jobs status=succeeded detail=listed jobs
+2026-06-16T12:54:16Z action=cron.remove_cron_job status=succeeded detail=Demo Task
+2026-06-16T12:54:25Z action=file.create_file status=succeeded detail=/tmp/tmp.PR85hgiTzt/file.txt
+2026-06-16T12:54:25Z action=file.create_dir status=succeeded detail=/tmp/tmp.PR85hgiTzt/folder
+2026-06-16T12:54:25Z action=file.rename_path status=succeeded detail=/tmp/tmp.PR85hgiTzt/file.txt -> /tmp/tmp.PR85hgiTzt/renamed.txt
+2026-06-16T12:54:25Z action=file.copy_path status=succeeded detail=/tmp/tmp.PR85hgiTzt/renamed.txt -> /tmp/tmp.PR85hgiTzt/copy.txt
+2026-06-16T12:54:25Z action=file.move_path status=succeeded detail=/tmp/tmp.PR85hgiTzt/copy.txt -> /tmp/tmp.PR85hgiTzt/moved.txt
+2026-06-16T12:54:25Z action=file.create_tar_gz status=succeeded detail=/tmp/tmp.PR85hgiTzt/folder -> /tmp/tmp.PR85hgiTzt/folder.tar.gz
+2026-06-16T12:54:25Z action=file.extract_tar_gz status=succeeded detail=/tmp/tmp.PR85hgiTzt/folder.tar.gz -> /tmp/tmp.PR85hgiTzt/tar_extract
+2026-06-16T12:54:25Z action=file.create_zip status=succeeded detail=/tmp/tmp.PR85hgiTzt/folder -> /tmp/tmp.PR85hgiTzt/folder.zip
+2026-06-16T12:54:25Z action=file.extract_zip status=succeeded detail=/tmp/tmp.PR85hgiTzt/folder.zip -> /tmp/tmp.PR85hgiTzt/zip_extract
+2026-06-16T12:54:25Z action=file.delete_path status=mocked detail=/tmp/tmp.PR85hgiTzt/moved.txt
+2026-06-16T12:54:25Z action=cron.add_cron_job status=succeeded detail=Demo Task
+2026-06-16T12:54:25Z action=cron.list_cron_jobs status=succeeded detail=listed jobs
+2026-06-16T12:54:25Z action=cron.remove_cron_job status=succeeded detail=Demo Task
+2026-06-16T12:55:03Z action=file.create_file status=succeeded detail=/tmp/tmp.I483gdyaio/file.txt
+2026-06-16T12:55:03Z action=file.create_dir status=succeeded detail=/tmp/tmp.I483gdyaio/folder
+2026-06-16T12:55:03Z action=file.rename_path status=succeeded detail=/tmp/tmp.I483gdyaio/file.txt -> /tmp/tmp.I483gdyaio/renamed.txt
+2026-06-16T12:55:03Z action=file.copy_path status=succeeded detail=/tmp/tmp.I483gdyaio/renamed.txt -> /tmp/tmp.I483gdyaio/copy.txt
+2026-06-16T12:55:03Z action=file.move_path status=succeeded detail=/tmp/tmp.I483gdyaio/copy.txt -> /tmp/tmp.I483gdyaio/moved.txt
+2026-06-16T12:55:03Z action=file.create_tar_gz status=succeeded detail=/tmp/tmp.I483gdyaio/folder -> /tmp/tmp.I483gdyaio/folder.tar.gz
+2026-06-16T12:55:03Z action=file.extract_tar_gz status=succeeded detail=/tmp/tmp.I483gdyaio/folder.tar.gz -> /tmp/tmp.I483gdyaio/tar_extract
+2026-06-16T12:55:03Z action=file.create_zip status=succeeded detail=/tmp/tmp.I483gdyaio/folder -> /tmp/tmp.I483gdyaio/folder.zip
+2026-06-16T12:55:03Z action=file.extract_zip status=succeeded detail=/tmp/tmp.I483gdyaio/folder.zip -> /tmp/tmp.I483gdyaio/zip_extract
+2026-06-16T12:55:03Z action=file.delete_path status=mocked detail=/tmp/tmp.I483gdyaio/moved.txt
+2026-06-16T12:55:03Z action=cron.add_cron_job status=succeeded detail=Demo Task
+2026-06-16T12:55:03Z action=cron.list_cron_jobs status=succeeded detail=listed jobs
+2026-06-16T12:55:03Z action=cron.remove_cron_job status=succeeded detail=Demo Task
+2026-06-16T12:56:15Z action=file.create_file status=succeeded detail=/tmp/tmp.GdEgGd3Aj5/file.txt
+2026-06-16T12:56:15Z action=file.create_file status=succeeded detail=/tmp/tmp.WIVsORwkAq/file.txt
+2026-06-16T12:56:15Z action=file.create_dir status=succeeded detail=/tmp/tmp.GdEgGd3Aj5/folder
+2026-06-16T12:56:15Z action=file.create_dir status=succeeded detail=/tmp/tmp.WIVsORwkAq/folder
+2026-06-16T12:56:15Z action=file.rename_path status=succeeded detail=/tmp/tmp.GdEgGd3Aj5/file.txt -> /tmp/tmp.GdEgGd3Aj5/renamed.txt
+2026-06-16T12:56:15Z action=file.rename_path status=succeeded detail=/tmp/tmp.WIVsORwkAq/file.txt -> /tmp/tmp.WIVsORwkAq/renamed.txt
+2026-06-16T12:56:15Z action=file.copy_path status=succeeded detail=/tmp/tmp.GdEgGd3Aj5/renamed.txt -> /tmp/tmp.GdEgGd3Aj5/copy.txt
+2026-06-16T12:56:15Z action=file.copy_path status=succeeded detail=/tmp/tmp.WIVsORwkAq/renamed.txt -> /tmp/tmp.WIVsORwkAq/copy.txt
+2026-06-16T12:56:15Z action=file.move_path status=succeeded detail=/tmp/tmp.GdEgGd3Aj5/copy.txt -> /tmp/tmp.GdEgGd3Aj5/moved.txt
+2026-06-16T12:56:15Z action=file.move_path status=succeeded detail=/tmp/tmp.WIVsORwkAq/copy.txt -> /tmp/tmp.WIVsORwkAq/moved.txt
+2026-06-16T12:56:15Z action=file.create_tar_gz status=succeeded detail=/tmp/tmp.GdEgGd3Aj5/folder -> /tmp/tmp.GdEgGd3Aj5/folder.tar.gz
+2026-06-16T12:56:15Z action=file.create_tar_gz status=succeeded detail=/tmp/tmp.WIVsORwkAq/folder -> /tmp/tmp.WIVsORwkAq/folder.tar.gz
+2026-06-16T12:56:15Z action=file.extract_tar_gz status=succeeded detail=/tmp/tmp.GdEgGd3Aj5/folder.tar.gz -> /tmp/tmp.GdEgGd3Aj5/tar_extract
+2026-06-16T12:56:15Z action=file.extract_tar_gz status=succeeded detail=/tmp/tmp.WIVsORwkAq/folder.tar.gz -> /tmp/tmp.WIVsORwkAq/tar_extract
+2026-06-16T12:56:15Z action=file.create_zip status=succeeded detail=/tmp/tmp.GdEgGd3Aj5/folder -> /tmp/tmp.GdEgGd3Aj5/folder.zip
+2026-06-16T12:56:15Z action=file.create_zip status=succeeded detail=/tmp/tmp.WIVsORwkAq/folder -> /tmp/tmp.WIVsORwkAq/folder.zip
+2026-06-16T12:56:15Z action=file.extract_zip status=succeeded detail=/tmp/tmp.GdEgGd3Aj5/folder.zip -> /tmp/tmp.GdEgGd3Aj5/zip_extract
+2026-06-16T12:56:15Z action=file.extract_zip status=succeeded detail=/tmp/tmp.WIVsORwkAq/folder.zip -> /tmp/tmp.WIVsORwkAq/zip_extract
+2026-06-16T12:56:15Z action=file.delete_path status=mocked detail=/tmp/tmp.GdEgGd3Aj5/moved.txt
+2026-06-16T12:56:15Z action=file.delete_path status=mocked detail=/tmp/tmp.WIVsORwkAq/moved.txt
+2026-06-16T12:56:15Z action=cron.add_cron_job status=succeeded detail=Demo Task
+2026-06-16T12:56:15Z action=cron.add_cron_job status=succeeded detail=Demo Task
+2026-06-16T12:56:15Z action=cron.list_cron_jobs status=succeeded detail=listed jobs
+2026-06-16T12:56:15Z action=cron.list_cron_jobs status=succeeded detail=listed jobs
+2026-06-16T12:56:15Z action=cron.remove_cron_job status=succeeded detail=Demo Task
+2026-06-16T12:56:15Z action=cron.remove_cron_job status=succeeded detail=Demo Task
+2026-06-16T13:07:13Z action=file.browse_folder status=succeeded detail=/home/duongduy
+2026-06-16T13:07:19Z action=file.browse_folder status=succeeded detail=/home/duongduy
+2026-06-16T13:07:51Z action=file.browse_folder status=succeeded detail=/home/duongduy/Desktop
+2026-06-16T13:07:55Z action=file.browse_folder status=succeeded detail=/home/duongduy
+2026-06-16T13:10:59Z action=file.create_file status=succeeded detail=/tmp/tmp.oC1q1pE09O/file.txt
+2026-06-16T13:10:59Z action=file.create_dir status=succeeded detail=/tmp/tmp.oC1q1pE09O/folder
+2026-06-16T13:10:59Z action=file.rename_path status=succeeded detail=/tmp/tmp.oC1q1pE09O/file.txt -> /tmp/tmp.oC1q1pE09O/renamed.txt
+2026-06-16T13:10:59Z action=file.copy_path status=succeeded detail=/tmp/tmp.oC1q1pE09O/renamed.txt -> /tmp/tmp.oC1q1pE09O/copy.txt
+2026-06-16T13:10:59Z action=file.move_path status=succeeded detail=/tmp/tmp.oC1q1pE09O/copy.txt -> /tmp/tmp.oC1q1pE09O/moved.txt
+2026-06-16T13:10:59Z action=file.create_tar_gz status=succeeded detail=/tmp/tmp.oC1q1pE09O/folder -> /tmp/tmp.oC1q1pE09O/folder.tar.gz
+2026-06-16T13:11:00Z action=file.extract_tar_gz status=succeeded detail=/tmp/tmp.oC1q1pE09O/folder.tar.gz -> /tmp/tmp.oC1q1pE09O/tar_extract
+2026-06-16T13:11:00Z action=file.create_zip status=succeeded detail=/tmp/tmp.oC1q1pE09O/folder -> /tmp/tmp.oC1q1pE09O/folder.zip
+2026-06-16T13:11:00Z action=file.extract_zip status=succeeded detail=/tmp/tmp.oC1q1pE09O/folder.zip -> /tmp/tmp.oC1q1pE09O/zip_extract
+2026-06-16T13:11:00Z action=file.delete_path status=mocked detail=/tmp/tmp.oC1q1pE09O/moved.txt
+2026-06-16T13:11:00Z action=cron.add_cron_job status=succeeded detail=Demo Task
+2026-06-16T13:11:00Z action=cron.list_cron_jobs status=succeeded detail=listed jobs
+2026-06-16T13:11:00Z action=cron.remove_cron_job status=succeeded detail=Demo Task
+2026-06-16T13:11:23Z action=file.browse_folder status=succeeded detail=/home/duongduy
+2026-06-16T13:13:48Z action=cron.list_cron_jobs status=succeeded detail=listed jobs
+2026-06-16T13:14:01Z action=cron.list_cron_jobs status=succeeded detail=listed jobs
+2026-06-16T13:14:21Z action=file.create_file status=succeeded detail=/tmp/tmp.H5wrmjnVSF/file.txt
+2026-06-16T13:14:21Z action=file.create_dir status=succeeded detail=/tmp/tmp.H5wrmjnVSF/folder
+2026-06-16T13:14:21Z action=file.rename_path status=succeeded detail=/tmp/tmp.H5wrmjnVSF/file.txt -> /tmp/tmp.H5wrmjnVSF/renamed.txt
+2026-06-16T13:14:21Z action=file.copy_path status=succeeded detail=/tmp/tmp.H5wrmjnVSF/renamed.txt -> /tmp/tmp.H5wrmjnVSF/copy.txt
+2026-06-16T13:14:21Z action=file.move_path status=succeeded detail=/tmp/tmp.H5wrmjnVSF/copy.txt -> /tmp/tmp.H5wrmjnVSF/moved.txt
+2026-06-16T13:14:21Z action=file.create_tar_gz status=succeeded detail=/tmp/tmp.H5wrmjnVSF/folder -> /tmp/tmp.H5wrmjnVSF/folder.tar.gz
+2026-06-16T13:14:21Z action=file.extract_tar_gz status=succeeded detail=/tmp/tmp.H5wrmjnVSF/folder.tar.gz -> /tmp/tmp.H5wrmjnVSF/tar_extract
+2026-06-16T13:14:21Z action=file.create_zip status=succeeded detail=/tmp/tmp.H5wrmjnVSF/folder -> /tmp/tmp.H5wrmjnVSF/folder.zip
+2026-06-16T13:14:21Z action=file.extract_zip status=succeeded detail=/tmp/tmp.H5wrmjnVSF/folder.zip -> /tmp/tmp.H5wrmjnVSF/zip_extract
+2026-06-16T13:14:21Z action=file.delete_path status=mocked detail=/tmp/tmp.H5wrmjnVSF/moved.txt
+2026-06-16T13:14:22Z action=cron.add_cron_job status=succeeded detail=Demo Task
+2026-06-16T13:14:22Z action=cron.list_cron_jobs status=succeeded detail=listed jobs
+2026-06-16T13:14:22Z action=cron.remove_cron_job status=succeeded detail=Demo Task
+2026-06-16T13:14:47Z action=time.toggle_ntp status=succeeded detail=false
+2026-06-16T13:14:56Z action=time.toggle_ntp status=succeeded detail=false
+2026-06-16T13:15:10Z action=time.toggle_ntp status=succeeded detail=false
+2026-06-16T13:15:31Z action=apt.search_packages status=succeeded detail=code
+2026-06-16T13:17:14Z action=file.browse_folder status=succeeded detail=/home/duongduy
+2026-06-16T13:17:18Z action=file.browse_folder status=succeeded detail=/home/duongduy/Android
+2026-06-16T13:26:52Z action=file.browse_folder status=succeeded detail=/home/duongduy
+2026-06-16T13:27:00Z action=file.browse_folder status=succeeded detail=/home/duongduy/data
+2026-06-16T13:27:06Z action=file.browse_folder status=succeeded detail=/home/duongduy
+2026-06-16T13:27:07Z action=file.browse_folder status=succeeded detail=/home/duongduy/data
+2026-06-16T13:27:11Z action=file.browse_folder status=succeeded detail=/home/duongduy
+2026-06-16T13:27:11Z action=file.browse_folder status=succeeded detail=/home
+2026-06-16T13:27:13Z action=file.browse_folder status=succeeded detail=/
+2026-06-16T13:27:16Z action=file.browse_folder status=succeeded detail=/home
+2026-06-16T13:27:17Z action=file.browse_folder status=succeeded detail=/home/duongduy
+2026-06-16T13:27:37Z action=file.search_files status=succeeded detail=/home/duongduy query=data
+2026-06-16T13:27:50Z action=file.browse_folder status=succeeded detail=/home/duongduy/data
+2026-06-16T13:29:08Z action=file.create_file status=succeeded detail=/tmp/tmp.CM8oKra3kJ/file.txt
+2026-06-16T13:29:08Z action=file.create_dir status=succeeded detail=/tmp/tmp.CM8oKra3kJ/folder
+2026-06-16T13:29:08Z action=file.rename_path status=succeeded detail=/tmp/tmp.CM8oKra3kJ/file.txt -> /tmp/tmp.CM8oKra3kJ/renamed.txt
+2026-06-16T13:29:08Z action=file.copy_path status=succeeded detail=/tmp/tmp.CM8oKra3kJ/renamed.txt -> /tmp/tmp.CM8oKra3kJ/copy.txt
+2026-06-16T13:29:08Z action=file.move_path status=succeeded detail=/tmp/tmp.CM8oKra3kJ/copy.txt -> /tmp/tmp.CM8oKra3kJ/moved.txt
+2026-06-16T13:29:08Z action=file.create_tar_gz status=succeeded detail=/tmp/tmp.CM8oKra3kJ/folder -> /tmp/tmp.CM8oKra3kJ/folder.tar.gz
+2026-06-16T13:29:08Z action=file.extract_tar_gz status=succeeded detail=/tmp/tmp.CM8oKra3kJ/folder.tar.gz -> /tmp/tmp.CM8oKra3kJ/tar_extract
+2026-06-16T13:29:08Z action=file.create_zip status=succeeded detail=/tmp/tmp.CM8oKra3kJ/folder -> /tmp/tmp.CM8oKra3kJ/folder.zip
+2026-06-16T13:29:08Z action=file.extract_zip status=succeeded detail=/tmp/tmp.CM8oKra3kJ/folder.zip -> /tmp/tmp.CM8oKra3kJ/zip_extract
+2026-06-16T13:29:08Z action=file.delete_path status=mocked detail=/tmp/tmp.CM8oKra3kJ/moved.txt
+2026-06-16T13:29:08Z action=cron.add_cron_job status=succeeded detail=Demo Task
+2026-06-16T13:29:09Z action=cron.list_cron_jobs status=succeeded detail=listed jobs
+2026-06-16T13:29:09Z action=cron.remove_cron_job status=succeeded detail=Demo Task
+2026-06-16T13:29:29Z action=file.browse_folder status=succeeded detail=/home/duongduy
+2026-06-16T13:30:58Z action=file.browse_folder status=succeeded detail=/home/duongduy/data
+2026-06-16T13:31:02Z action=file.browse_folder status=succeeded detail=/home/duongduy
+2026-06-16T13:31:04Z action=cron.list_cron_jobs status=succeeded detail=listed jobs
+2026-06-16T13:31:14Z action=cron.list_cron_jobs status=succeeded detail=listed jobs
+2026-06-16T13:31:25Z action=apt.search_packages status=succeeded detail=code
+2026-06-16T13:32:26Z action=file.create_file status=succeeded detail=/tmp/tmp.PVcUFsTau8/file.txt
+2026-06-16T13:32:26Z action=file.create_dir status=succeeded detail=/tmp/tmp.PVcUFsTau8/folder
+2026-06-16T13:32:26Z action=file.rename_path status=succeeded detail=/tmp/tmp.PVcUFsTau8/file.txt -> /tmp/tmp.PVcUFsTau8/renamed.txt
+2026-06-16T13:32:26Z action=file.copy_path status=succeeded detail=/tmp/tmp.PVcUFsTau8/renamed.txt -> /tmp/tmp.PVcUFsTau8/copy.txt
+2026-06-16T13:32:26Z action=file.move_path status=succeeded detail=/tmp/tmp.PVcUFsTau8/copy.txt -> /tmp/tmp.PVcUFsTau8/moved.txt
+2026-06-16T13:32:26Z action=file.create_tar_gz status=succeeded detail=/tmp/tmp.PVcUFsTau8/folder -> /tmp/tmp.PVcUFsTau8/folder.tar.gz
+2026-06-16T13:32:26Z action=file.extract_tar_gz status=succeeded detail=/tmp/tmp.PVcUFsTau8/folder.tar.gz -> /tmp/tmp.PVcUFsTau8/tar_extract
+2026-06-16T13:32:26Z action=file.create_zip status=succeeded detail=/tmp/tmp.PVcUFsTau8/folder -> /tmp/tmp.PVcUFsTau8/folder.zip
+2026-06-16T13:32:26Z action=file.extract_zip status=succeeded detail=/tmp/tmp.PVcUFsTau8/folder.zip -> /tmp/tmp.PVcUFsTau8/zip_extract
+2026-06-16T13:32:26Z action=file.delete_path status=mocked detail=/tmp/tmp.PVcUFsTau8/moved.txt
+2026-06-16T13:32:26Z action=cron.add_cron_job status=succeeded detail=Demo Task
+2026-06-16T13:32:26Z action=cron.list_cron_jobs status=succeeded detail=listed jobs
+2026-06-16T13:32:26Z action=cron.remove_cron_job status=succeeded detail=Demo Task
+2026-06-16T13:34:09Z action=cron.list_cron_jobs status=succeeded detail=listed jobs
+2026-06-16T13:34:35Z action=file.browse_folder status=succeeded detail=/home/duongduy/data
+2026-06-16T13:34:35Z action=file.browse_folder status=succeeded detail=/home/duongduy/data
+2026-06-16T13:34:47Z action=file.search_files status=succeeded detail=/home/duongduy/data query=data
+2026-06-16T13:35:08Z action=cron.list_cron_jobs status=succeeded detail=listed jobs
+2026-06-16T13:35:18Z action=cron.list_cron_jobs status=succeeded detail=listed jobs
+2026-06-16T13:37:33Z action=apt.install_package status=succeeded detail=gir1.2-geocodeglib-2.0
+2026-06-16T13:37:56Z action=cron.list_cron_jobs status=succeeded detail=listed jobs
+2026-06-16T13:38:13Z action=file.browse_folder status=succeeded detail=/home/duongduy
+2026-06-16T13:38:39Z action=file.browse_folder status=succeeded detail=/home/duongduy/fcitx5-unikey
+2026-06-16T13:38:44Z action=file.browse_folder status=succeeded detail=/home/duongduy/fcitx5-unikey/macro-editor
+2026-06-16T13:38:46Z action=file.browse_folder status=succeeded detail=/home/duongduy/fcitx5-unikey
+2026-06-16T13:38:59Z action=file.browse_folder status=succeeded detail=/home/duongduy/Pictures
+2026-06-16T13:39:02Z action=file.browse_folder status=succeeded detail=/home/duongduy/Pictures/Screenshots
+2026-06-16T13:39:03Z action=file.browse_folder status=succeeded detail=/home/duongduy/Pictures/Screenshots
+2026-06-16T13:47:28Z action=file.create_file status=succeeded detail=/tmp/tmp.LdYEFHvujr/file.txt
+2026-06-16T13:47:28Z action=file.create_dir status=succeeded detail=/tmp/tmp.LdYEFHvujr/folder
+2026-06-16T13:47:28Z action=file.rename_path status=succeeded detail=/tmp/tmp.LdYEFHvujr/file.txt -> /tmp/tmp.LdYEFHvujr/renamed.txt
+2026-06-16T13:47:28Z action=file.copy_path status=succeeded detail=/tmp/tmp.LdYEFHvujr/renamed.txt -> /tmp/tmp.LdYEFHvujr/copy.txt
+2026-06-16T13:47:28Z action=file.move_path status=succeeded detail=/tmp/tmp.LdYEFHvujr/copy.txt -> /tmp/tmp.LdYEFHvujr/moved.txt
+2026-06-16T13:47:28Z action=file.create_tar_gz status=succeeded detail=/tmp/tmp.LdYEFHvujr/folder -> /tmp/tmp.LdYEFHvujr/folder.tar.gz
+2026-06-16T13:47:28Z action=file.extract_tar_gz status=succeeded detail=/tmp/tmp.LdYEFHvujr/folder.tar.gz -> /tmp/tmp.LdYEFHvujr/tar_extract
+2026-06-16T13:47:28Z action=file.create_zip status=succeeded detail=/tmp/tmp.LdYEFHvujr/folder -> /tmp/tmp.LdYEFHvujr/folder.zip
+2026-06-16T13:47:28Z action=file.extract_zip status=succeeded detail=/tmp/tmp.LdYEFHvujr/folder.zip -> /tmp/tmp.LdYEFHvujr/zip_extract
+2026-06-16T13:47:28Z action=file.delete_path status=mocked detail=/tmp/tmp.LdYEFHvujr/moved.txt
+2026-06-16T13:47:28Z action=cron.add_cron_job status=succeeded detail=Demo Task
+2026-06-16T13:47:28Z action=cron.list_cron_jobs status=succeeded detail=listed jobs
+2026-06-16T13:47:28Z action=cron.remove_cron_job status=succeeded detail=Demo Task
+2026-06-16T13:48:14Z action=file.create_file status=succeeded detail=/tmp/tmp.jDZkFdc6WQ/file.txt
+2026-06-16T13:48:14Z action=file.create_dir status=succeeded detail=/tmp/tmp.jDZkFdc6WQ/folder
+2026-06-16T13:48:14Z action=file.rename_path status=succeeded detail=/tmp/tmp.jDZkFdc6WQ/file.txt -> /tmp/tmp.jDZkFdc6WQ/renamed.txt
+2026-06-16T13:48:14Z action=file.copy_path status=succeeded detail=/tmp/tmp.jDZkFdc6WQ/renamed.txt -> /tmp/tmp.jDZkFdc6WQ/copy.txt
+2026-06-16T13:48:14Z action=file.move_path status=succeeded detail=/tmp/tmp.jDZkFdc6WQ/copy.txt -> /tmp/tmp.jDZkFdc6WQ/moved.txt
+2026-06-16T13:48:14Z action=file.create_tar_gz status=succeeded detail=/tmp/tmp.jDZkFdc6WQ/folder -> /tmp/tmp.jDZkFdc6WQ/folder.tar.gz
+2026-06-16T13:48:14Z action=file.extract_tar_gz status=succeeded detail=/tmp/tmp.jDZkFdc6WQ/folder.tar.gz -> /tmp/tmp.jDZkFdc6WQ/tar_extract
+2026-06-16T13:48:14Z action=file.create_zip status=succeeded detail=/tmp/tmp.jDZkFdc6WQ/folder -> /tmp/tmp.jDZkFdc6WQ/folder.zip
+2026-06-16T13:48:14Z action=file.extract_zip status=succeeded detail=/tmp/tmp.jDZkFdc6WQ/folder.zip -> /tmp/tmp.jDZkFdc6WQ/zip_extract
+2026-06-16T13:48:14Z action=file.delete_path status=mocked detail=/tmp/tmp.jDZkFdc6WQ/moved.txt
+2026-06-16T13:48:14Z action=cron.add_cron_job status=succeeded detail=Demo Task
+2026-06-16T13:48:15Z action=cron.list_cron_jobs status=succeeded detail=listed jobs
+2026-06-16T13:48:15Z action=cron.remove_cron_job status=succeeded detail=Demo Task
+2026-06-16T13:48:57Z action=file.create_file status=succeeded detail=/tmp/tmp.YM0cttiOAr/file.txt
+2026-06-16T13:48:57Z action=file.create_dir status=succeeded detail=/tmp/tmp.YM0cttiOAr/folder
+2026-06-16T13:48:57Z action=file.rename_path status=succeeded detail=/tmp/tmp.YM0cttiOAr/file.txt -> /tmp/tmp.YM0cttiOAr/renamed.txt
+2026-06-16T13:48:57Z action=file.copy_path status=succeeded detail=/tmp/tmp.YM0cttiOAr/renamed.txt -> /tmp/tmp.YM0cttiOAr/copy.txt
+2026-06-16T13:48:57Z action=file.move_path status=succeeded detail=/tmp/tmp.YM0cttiOAr/copy.txt -> /tmp/tmp.YM0cttiOAr/moved.txt
+2026-06-16T13:48:57Z action=file.create_tar_gz status=succeeded detail=/tmp/tmp.YM0cttiOAr/folder -> /tmp/tmp.YM0cttiOAr/folder.tar.gz
+2026-06-16T13:48:57Z action=file.extract_tar_gz status=succeeded detail=/tmp/tmp.YM0cttiOAr/folder.tar.gz -> /tmp/tmp.YM0cttiOAr/tar_extract
+2026-06-16T13:48:57Z action=file.create_zip status=succeeded detail=/tmp/tmp.YM0cttiOAr/folder -> /tmp/tmp.YM0cttiOAr/folder.zip
+2026-06-16T13:48:57Z action=file.extract_zip status=succeeded detail=/tmp/tmp.YM0cttiOAr/folder.zip -> /tmp/tmp.YM0cttiOAr/zip_extract
+2026-06-16T13:48:57Z action=file.delete_path status=mocked detail=/tmp/tmp.YM0cttiOAr/moved.txt
+2026-06-16T13:48:57Z action=cron.add_cron_job status=succeeded detail=Demo Task
+2026-06-16T13:48:57Z action=cron.list_cron_jobs status=succeeded detail=listed jobs
+2026-06-16T13:48:57Z action=cron.remove_cron_job status=succeeded detail=Demo Task
+2026-06-16T13:50:33Z action=file.create_file status=succeeded detail=/tmp/tmp.uSElnmLGsI/file.txt
+2026-06-16T13:50:33Z action=file.create_dir status=succeeded detail=/tmp/tmp.uSElnmLGsI/folder
+2026-06-16T13:50:33Z action=file.rename_path status=succeeded detail=/tmp/tmp.uSElnmLGsI/file.txt -> /tmp/tmp.uSElnmLGsI/renamed.txt
+2026-06-16T13:50:33Z action=file.copy_path status=succeeded detail=/tmp/tmp.uSElnmLGsI/renamed.txt -> /tmp/tmp.uSElnmLGsI/copy.txt
+2026-06-16T13:50:33Z action=file.move_path status=succeeded detail=/tmp/tmp.uSElnmLGsI/copy.txt -> /tmp/tmp.uSElnmLGsI/moved.txt
+2026-06-16T13:50:33Z action=file.create_tar_gz status=succeeded detail=/tmp/tmp.uSElnmLGsI/folder -> /tmp/tmp.uSElnmLGsI/folder.tar.gz
+2026-06-16T13:50:33Z action=file.extract_tar_gz status=succeeded detail=/tmp/tmp.uSElnmLGsI/folder.tar.gz -> /tmp/tmp.uSElnmLGsI/tar_extract
+2026-06-16T13:50:33Z action=file.create_zip status=succeeded detail=/tmp/tmp.uSElnmLGsI/folder -> /tmp/tmp.uSElnmLGsI/folder.zip
+2026-06-16T13:50:33Z action=file.extract_zip status=succeeded detail=/tmp/tmp.uSElnmLGsI/folder.zip -> /tmp/tmp.uSElnmLGsI/zip_extract
+2026-06-16T13:50:33Z action=file.delete_path status=mocked detail=/tmp/tmp.uSElnmLGsI/moved.txt
+2026-06-16T13:50:33Z action=cron.add_cron_job status=succeeded detail=Demo Task
+2026-06-16T13:50:33Z action=cron.list_cron_jobs status=succeeded detail=listed jobs
+2026-06-16T13:50:33Z action=cron.remove_cron_job status=succeeded detail=Demo Task
+2026-06-16T13:50:47Z action=file.browse_folder status=succeeded detail=/home/duongduy
+2026-06-16T13:50:51Z action=file.browse_folder status=succeeded detail=/home/duongduy
+2026-06-16T13:51:01Z action=cron.list_cron_jobs status=succeeded detail=listed jobs
+2026-06-16T13:55:02Z action=file.create_file status=succeeded detail=/tmp/tmp.x392RqCWmY/file.txt
+2026-06-16T13:55:02Z action=file.create_dir status=succeeded detail=/tmp/tmp.x392RqCWmY/folder
+2026-06-16T13:55:02Z action=file.rename_path status=succeeded detail=/tmp/tmp.x392RqCWmY/file.txt -> /tmp/tmp.x392RqCWmY/renamed.txt
+2026-06-16T13:55:02Z action=file.copy_path status=succeeded detail=/tmp/tmp.x392RqCWmY/renamed.txt -> /tmp/tmp.x392RqCWmY/copy.txt
+2026-06-16T13:55:02Z action=file.move_path status=succeeded detail=/tmp/tmp.x392RqCWmY/copy.txt -> /tmp/tmp.x392RqCWmY/moved.txt
+2026-06-16T13:55:02Z action=file.create_tar_gz status=succeeded detail=/tmp/tmp.x392RqCWmY/folder -> /tmp/tmp.x392RqCWmY/folder.tar.gz
+2026-06-16T13:55:02Z action=file.extract_tar_gz status=succeeded detail=/tmp/tmp.x392RqCWmY/folder.tar.gz -> /tmp/tmp.x392RqCWmY/tar_extract
+2026-06-16T13:55:02Z action=file.create_zip status=succeeded detail=/tmp/tmp.x392RqCWmY/folder -> /tmp/tmp.x392RqCWmY/folder.zip
+2026-06-16T13:55:02Z action=file.extract_zip status=succeeded detail=/tmp/tmp.x392RqCWmY/folder.zip -> /tmp/tmp.x392RqCWmY/zip_extract
+2026-06-16T13:55:02Z action=file.delete_path status=mocked detail=/tmp/tmp.x392RqCWmY/moved.txt
+2026-06-16T13:55:02Z action=cron.add_cron_job status=succeeded detail=Demo Task
+2026-06-16T13:55:02Z action=cron.list_cron_jobs status=succeeded detail=listed jobs
+2026-06-16T13:55:02Z action=cron.remove_cron_job status=succeeded detail=Demo Task
+2026-06-16T13:56:32Z action=file.create_file status=succeeded detail=/tmp/tmp.lJ2weDUgU8/file.txt
+2026-06-16T13:56:32Z action=file.create_dir status=succeeded detail=/tmp/tmp.lJ2weDUgU8/folder
+2026-06-16T13:56:32Z action=file.rename_path status=succeeded detail=/tmp/tmp.lJ2weDUgU8/file.txt -> /tmp/tmp.lJ2weDUgU8/renamed.txt
+2026-06-16T13:56:32Z action=file.copy_path status=succeeded detail=/tmp/tmp.lJ2weDUgU8/renamed.txt -> /tmp/tmp.lJ2weDUgU8/copy.txt
+2026-06-16T13:56:32Z action=file.move_path status=succeeded detail=/tmp/tmp.lJ2weDUgU8/copy.txt -> /tmp/tmp.lJ2weDUgU8/moved.txt
+2026-06-16T13:56:32Z action=file.create_tar_gz status=succeeded detail=/tmp/tmp.lJ2weDUgU8/folder -> /tmp/tmp.lJ2weDUgU8/folder.tar.gz
+2026-06-16T13:56:32Z action=file.extract_tar_gz status=succeeded detail=/tmp/tmp.lJ2weDUgU8/folder.tar.gz -> /tmp/tmp.lJ2weDUgU8/tar_extract
+2026-06-16T13:56:32Z action=file.create_zip status=succeeded detail=/tmp/tmp.lJ2weDUgU8/folder -> /tmp/tmp.lJ2weDUgU8/folder.zip
+2026-06-16T13:56:32Z action=file.extract_zip status=succeeded detail=/tmp/tmp.lJ2weDUgU8/folder.zip -> /tmp/tmp.lJ2weDUgU8/zip_extract
+2026-06-16T13:56:32Z action=file.delete_path status=mocked detail=/tmp/tmp.lJ2weDUgU8/moved.txt
+2026-06-16T13:56:32Z action=cron.add_cron_job status=succeeded detail=Demo Task
+2026-06-16T13:56:32Z action=cron.list_cron_jobs status=succeeded detail=listed jobs
+2026-06-16T13:56:32Z action=cron.remove_cron_job status=succeeded detail=Demo Task
+2026-06-16T13:57:45Z action=file.browse_folder status=succeeded detail=/home/duongduy
+2026-06-16T13:57:48Z action=cron.list_cron_jobs status=succeeded detail=listed jobs
+2026-06-16T13:57:52Z action=file.browse_folder status=succeeded detail=/home/duongduy
+2026-06-16T13:57:54Z action=file.browse_folder status=succeeded detail=/home/duongduy
+2026-06-16T13:57:56Z action=cron.list_cron_jobs status=succeeded detail=listed jobs
+2026-06-16T13:58:02Z action=cron.list_cron_jobs status=succeeded detail=listed jobs
+2026-06-16T13:58:03Z action=cron.list_cron_jobs status=succeeded detail=listed jobs
+2026-06-16T14:04:16Z action=file.browse_folder status=succeeded detail=/home/duongduy
+2026-06-16T14:05:36Z action=file.browse_folder status=succeeded detail=/tmp
+2026-06-16T14:07:07Z action=file.create_file status=succeeded detail=/tmp/tmp.f2i9gAs6vf/file.txt
+2026-06-16T14:07:07Z action=file.create_dir status=succeeded detail=/tmp/tmp.f2i9gAs6vf/folder
+2026-06-16T14:07:07Z action=file.rename_path status=succeeded detail=/tmp/tmp.f2i9gAs6vf/file.txt -> /tmp/tmp.f2i9gAs6vf/renamed.txt
+2026-06-16T14:07:07Z action=file.copy_path status=succeeded detail=/tmp/tmp.f2i9gAs6vf/renamed.txt -> /tmp/tmp.f2i9gAs6vf/copy.txt
+2026-06-16T14:07:07Z action=file.move_path status=succeeded detail=/tmp/tmp.f2i9gAs6vf/copy.txt -> /tmp/tmp.f2i9gAs6vf/moved.txt
+2026-06-16T14:07:07Z action=file.create_tar_gz status=succeeded detail=/tmp/tmp.f2i9gAs6vf/folder -> /tmp/tmp.f2i9gAs6vf/folder.tar.gz
+2026-06-16T14:07:07Z action=file.extract_tar_gz status=succeeded detail=/tmp/tmp.f2i9gAs6vf/folder.tar.gz -> /tmp/tmp.f2i9gAs6vf/tar_extract
+2026-06-16T14:07:07Z action=file.create_zip status=succeeded detail=/tmp/tmp.f2i9gAs6vf/folder -> /tmp/tmp.f2i9gAs6vf/folder.zip
+2026-06-16T14:07:07Z action=file.extract_zip status=succeeded detail=/tmp/tmp.f2i9gAs6vf/folder.zip -> /tmp/tmp.f2i9gAs6vf/zip_extract
+2026-06-16T14:07:07Z action=file.delete_path status=mocked detail=/tmp/tmp.f2i9gAs6vf/moved.txt
+2026-06-16T14:07:07Z action=cron.add_cron_job status=succeeded detail=Demo Task
+2026-06-16T14:07:07Z action=cron.list_cron_jobs status=succeeded detail=listed jobs
+2026-06-16T14:07:07Z action=cron.remove_cron_job status=succeeded detail=Demo Task
+2026-06-16T14:07:18Z action=file.create_file status=succeeded detail=/tmp/tmp.VsC0ZTc3BR/file.txt
+2026-06-16T14:07:18Z action=file.create_dir status=succeeded detail=/tmp/tmp.VsC0ZTc3BR/folder
+2026-06-16T14:07:18Z action=file.rename_path status=succeeded detail=/tmp/tmp.VsC0ZTc3BR/file.txt -> /tmp/tmp.VsC0ZTc3BR/renamed.txt
+2026-06-16T14:07:18Z action=file.copy_path status=succeeded detail=/tmp/tmp.VsC0ZTc3BR/renamed.txt -> /tmp/tmp.VsC0ZTc3BR/copy.txt
+2026-06-16T14:07:18Z action=file.move_path status=succeeded detail=/tmp/tmp.VsC0ZTc3BR/copy.txt -> /tmp/tmp.VsC0ZTc3BR/moved.txt
+2026-06-16T14:07:18Z action=file.create_tar_gz status=succeeded detail=/tmp/tmp.VsC0ZTc3BR/folder -> /tmp/tmp.VsC0ZTc3BR/folder.tar.gz
+2026-06-16T14:07:18Z action=file.extract_tar_gz status=succeeded detail=/tmp/tmp.VsC0ZTc3BR/folder.tar.gz -> /tmp/tmp.VsC0ZTc3BR/tar_extract
+2026-06-16T14:07:18Z action=file.create_zip status=succeeded detail=/tmp/tmp.VsC0ZTc3BR/folder -> /tmp/tmp.VsC0ZTc3BR/folder.zip
+2026-06-16T14:07:18Z action=file.extract_zip status=succeeded detail=/tmp/tmp.VsC0ZTc3BR/folder.zip -> /tmp/tmp.VsC0ZTc3BR/zip_extract
+2026-06-16T14:07:18Z action=file.delete_path status=mocked detail=/tmp/tmp.VsC0ZTc3BR/moved.txt
+2026-06-16T14:07:18Z action=cron.add_cron_job status=succeeded detail=Demo Task
+2026-06-16T14:07:18Z action=cron.list_cron_jobs status=succeeded detail=listed jobs
+2026-06-16T14:07:18Z action=cron.remove_cron_job status=succeeded detail=Demo Task
+2026-06-16T14:07:55Z action=file.browse_folder status=succeeded detail=/home/duongduy
+2026-06-16T14:59:46Z action=file.create_file status=succeeded detail=/tmp/tmp.S4YE8rW9LO/file.txt
+2026-06-16T14:59:46Z action=file.create_dir status=succeeded detail=/tmp/tmp.S4YE8rW9LO/folder
+2026-06-16T14:59:47Z action=file.browse_folder status=succeeded detail=/tmp/tmp.S4YE8rW9LO
+2026-06-16T14:59:47Z action=file.rename_path status=succeeded detail=/tmp/tmp.S4YE8rW9LO/file.txt -> /tmp/tmp.S4YE8rW9LO/renamed.txt
+2026-06-16T14:59:47Z action=file.copy_path status=succeeded detail=/tmp/tmp.S4YE8rW9LO/renamed.txt -> /tmp/tmp.S4YE8rW9LO/copy.txt
+2026-06-16T14:59:47Z action=file.move_path status=succeeded detail=/tmp/tmp.S4YE8rW9LO/copy.txt -> /tmp/tmp.S4YE8rW9LO/moved.txt
+2026-06-16T14:59:47Z action=file.create_tar_gz status=succeeded detail=/tmp/tmp.S4YE8rW9LO/folder -> /tmp/tmp.S4YE8rW9LO/folder.tar.gz
+2026-06-16T14:59:47Z action=file.extract_tar_gz status=succeeded detail=/tmp/tmp.S4YE8rW9LO/folder.tar.gz -> /tmp/tmp.S4YE8rW9LO/tar_extract
+2026-06-16T14:59:47Z action=file.create_zip status=succeeded detail=/tmp/tmp.S4YE8rW9LO/folder -> /tmp/tmp.S4YE8rW9LO/folder.zip
+2026-06-16T14:59:47Z action=file.extract_zip status=succeeded detail=/tmp/tmp.S4YE8rW9LO/folder.zip -> /tmp/tmp.S4YE8rW9LO/zip_extract
+2026-06-16T14:59:47Z action=file.delete_path status=mocked detail=/tmp/tmp.S4YE8rW9LO/moved.txt
+2026-06-16T14:59:47Z action=cron.add_cron_job status=succeeded detail=Demo Task
+2026-06-16T14:59:47Z action=cron.list_cron_jobs status=succeeded detail=listed jobs
+2026-06-16T14:59:47Z action=cron.remove_cron_job status=succeeded detail=Demo Task
+2026-06-16T15:00:02Z action=file.create_file status=succeeded detail=/tmp/tmp.R5BuhosP6i/file.txt
+2026-06-16T15:00:02Z action=file.browse_folder status=succeeded detail=/tmp/tmp.wNzGErVBUy
+2026-06-16T15:00:02Z action=file.create_dir status=succeeded detail=/tmp/tmp.R5BuhosP6i/folder
+2026-06-16T15:00:02Z action=file.browse_folder status=succeeded detail=/tmp/tmp.R5BuhosP6i
+2026-06-16T15:00:02Z action=file.rename_path status=succeeded detail=/tmp/tmp.R5BuhosP6i/file.txt -> /tmp/tmp.R5BuhosP6i/renamed.txt
+2026-06-16T15:00:02Z action=file.copy_path status=succeeded detail=/tmp/tmp.R5BuhosP6i/renamed.txt -> /tmp/tmp.R5BuhosP6i/copy.txt
+2026-06-16T15:00:02Z action=file.move_path status=succeeded detail=/tmp/tmp.R5BuhosP6i/copy.txt -> /tmp/tmp.R5BuhosP6i/moved.txt
+2026-06-16T15:00:02Z action=file.create_tar_gz status=succeeded detail=/tmp/tmp.R5BuhosP6i/folder -> /tmp/tmp.R5BuhosP6i/folder.tar.gz
+2026-06-16T15:00:03Z action=file.extract_tar_gz status=succeeded detail=/tmp/tmp.R5BuhosP6i/folder.tar.gz -> /tmp/tmp.R5BuhosP6i/tar_extract
+2026-06-16T15:00:03Z action=file.create_zip status=succeeded detail=/tmp/tmp.R5BuhosP6i/folder -> /tmp/tmp.R5BuhosP6i/folder.zip
+2026-06-16T15:00:03Z action=file.extract_zip status=succeeded detail=/tmp/tmp.R5BuhosP6i/folder.zip -> /tmp/tmp.R5BuhosP6i/zip_extract
+2026-06-16T15:00:03Z action=file.delete_path status=mocked detail=/tmp/tmp.R5BuhosP6i/moved.txt
+2026-06-16T15:00:03Z action=cron.add_cron_job status=succeeded detail=Demo Task
+2026-06-16T15:00:03Z action=cron.list_cron_jobs status=succeeded detail=listed jobs
+2026-06-16T15:00:03Z action=cron.remove_cron_job status=succeeded detail=Demo Task
+2026-06-16T15:02:19Z action=file.browse_folder status=succeeded detail=/home/duongduy
+2026-06-16T15:02:27Z action=file.browse_folder status=succeeded detail=/home/duongduy/Music
+2026-06-16T15:02:35Z action=file.browse_folder status=succeeded detail=/home/duongduy
+2026-06-16T15:04:31Z action=file.create_file status=succeeded detail=/tmp/tmp.qXUEHpfBwu/file.txt
+2026-06-16T15:04:31Z action=file.create_dir status=succeeded detail=/tmp/tmp.qXUEHpfBwu/folder
+2026-06-16T15:04:31Z action=file.browse_folder status=succeeded detail=/tmp/tmp.qXUEHpfBwu
+2026-06-16T15:04:31Z action=file.rename_path status=succeeded detail=/tmp/tmp.qXUEHpfBwu/file.txt -> /tmp/tmp.qXUEHpfBwu/renamed.txt
+2026-06-16T15:04:31Z action=file.copy_path status=succeeded detail=/tmp/tmp.qXUEHpfBwu/renamed.txt -> /tmp/tmp.qXUEHpfBwu/copy.txt
+2026-06-16T15:04:31Z action=file.move_path status=succeeded detail=/tmp/tmp.qXUEHpfBwu/copy.txt -> /tmp/tmp.qXUEHpfBwu/moved.txt
+2026-06-16T15:04:31Z action=file.create_tar_gz status=succeeded detail=/tmp/tmp.qXUEHpfBwu/folder -> /tmp/tmp.qXUEHpfBwu/folder.tar.gz
+2026-06-16T15:04:31Z action=file.extract_tar_gz status=succeeded detail=/tmp/tmp.qXUEHpfBwu/folder.tar.gz -> /tmp/tmp.qXUEHpfBwu/tar_extract
+2026-06-16T15:04:31Z action=file.create_zip status=succeeded detail=/tmp/tmp.qXUEHpfBwu/folder -> /tmp/tmp.qXUEHpfBwu/folder.zip
+2026-06-16T15:04:31Z action=file.extract_zip status=succeeded detail=/tmp/tmp.qXUEHpfBwu/folder.zip -> /tmp/tmp.qXUEHpfBwu/zip_extract
+2026-06-16T15:04:31Z action=file.delete_path status=mocked detail=/tmp/tmp.qXUEHpfBwu/moved.txt
+2026-06-16T15:04:31Z action=cron.add_cron_job status=succeeded detail=Demo Task
+2026-06-16T15:04:31Z action=cron.list_cron_jobs status=succeeded detail=listed jobs
+2026-06-16T15:04:31Z action=cron.remove_cron_job status=succeeded detail=Demo Task
+2026-06-16T15:04:42Z action=file.browse_folder status=succeeded detail=/tmp/tmp.wBSdSV0Gq1
+2026-06-16T15:04:42Z action=file.create_file status=succeeded detail=/tmp/tmp.A26uRbQnRy/file.txt
+2026-06-16T15:04:42Z action=file.create_dir status=succeeded detail=/tmp/tmp.A26uRbQnRy/folder
+2026-06-16T15:04:42Z action=file.browse_folder status=succeeded detail=/tmp/tmp.A26uRbQnRy
+2026-06-16T15:04:42Z action=file.rename_path status=succeeded detail=/tmp/tmp.A26uRbQnRy/file.txt -> /tmp/tmp.A26uRbQnRy/renamed.txt
+2026-06-16T15:04:42Z action=file.copy_path status=succeeded detail=/tmp/tmp.A26uRbQnRy/renamed.txt -> /tmp/tmp.A26uRbQnRy/copy.txt
+2026-06-16T15:04:43Z action=file.move_path status=succeeded detail=/tmp/tmp.A26uRbQnRy/copy.txt -> /tmp/tmp.A26uRbQnRy/moved.txt
+2026-06-16T15:04:43Z action=file.create_tar_gz status=succeeded detail=/tmp/tmp.A26uRbQnRy/folder -> /tmp/tmp.A26uRbQnRy/folder.tar.gz
+2026-06-16T15:04:43Z action=file.extract_tar_gz status=succeeded detail=/tmp/tmp.A26uRbQnRy/folder.tar.gz -> /tmp/tmp.A26uRbQnRy/tar_extract
+2026-06-16T15:04:43Z action=file.create_zip status=succeeded detail=/tmp/tmp.A26uRbQnRy/folder -> /tmp/tmp.A26uRbQnRy/folder.zip
+2026-06-16T15:04:43Z action=file.extract_zip status=succeeded detail=/tmp/tmp.A26uRbQnRy/folder.zip -> /tmp/tmp.A26uRbQnRy/zip_extract
+2026-06-16T15:04:43Z action=file.delete_path status=mocked detail=/tmp/tmp.A26uRbQnRy/moved.txt
+2026-06-16T15:04:43Z action=cron.add_cron_job status=succeeded detail=Demo Task
+2026-06-16T15:04:43Z action=cron.list_cron_jobs status=succeeded detail=listed jobs
+2026-06-16T15:04:43Z action=cron.remove_cron_job status=succeeded detail=Demo Task
+2026-06-17T16:11:33Z action=file.browse_folder status=succeeded detail=/home/duongduy
+2026-06-17T16:13:32Z action=file.create_file status=succeeded detail=/tmp/tmp.ePxPJFSiD9/file.txt
+2026-06-17T16:13:32Z action=file.create_dir status=succeeded detail=/tmp/tmp.ePxPJFSiD9/folder
+2026-06-17T16:13:32Z action=file.browse_folder status=succeeded detail=/tmp/tmp.ePxPJFSiD9
+2026-06-17T16:13:32Z action=file.rename_path status=succeeded detail=/tmp/tmp.ePxPJFSiD9/file.txt -> /tmp/tmp.ePxPJFSiD9/renamed.txt
+2026-06-17T16:13:32Z action=file.copy_path status=succeeded detail=/tmp/tmp.ePxPJFSiD9/renamed.txt -> /tmp/tmp.ePxPJFSiD9/copy.txt
+2026-06-17T16:13:32Z action=file.move_path status=succeeded detail=/tmp/tmp.ePxPJFSiD9/copy.txt -> /tmp/tmp.ePxPJFSiD9/moved.txt
+2026-06-17T16:13:33Z action=file.create_tar_gz status=succeeded detail=/tmp/tmp.ePxPJFSiD9/folder -> /tmp/tmp.ePxPJFSiD9/folder.tar.gz
+2026-06-17T16:13:33Z action=file.extract_tar_gz status=succeeded detail=/tmp/tmp.ePxPJFSiD9/folder.tar.gz -> /tmp/tmp.ePxPJFSiD9/tar_extract
+2026-06-17T16:13:33Z action=file.create_zip status=succeeded detail=/tmp/tmp.ePxPJFSiD9/folder -> /tmp/tmp.ePxPJFSiD9/folder.zip
+2026-06-17T16:13:33Z action=file.extract_zip status=succeeded detail=/tmp/tmp.ePxPJFSiD9/folder.zip -> /tmp/tmp.ePxPJFSiD9/zip_extract
+2026-06-17T16:13:33Z action=file.delete_path status=mocked detail=/tmp/tmp.ePxPJFSiD9/moved.txt
+2026-06-17T16:13:33Z action=cron.add_cron_job status=succeeded detail=Demo Task
+2026-06-17T16:13:33Z action=cron.list_cron_jobs status=succeeded detail=listed jobs
+2026-06-17T16:13:33Z action=cron.remove_cron_job status=succeeded detail=Demo Task
+2026-06-17T16:13:36Z action=file.create_file status=succeeded detail=/tmp/tmp.E2jzGlo5Db/file.txt
+2026-06-17T16:13:36Z action=file.create_dir status=succeeded detail=/tmp/tmp.E2jzGlo5Db/folder
+2026-06-17T16:13:36Z action=file.browse_folder status=succeeded detail=/tmp/tmp.E2jzGlo5Db
+2026-06-17T16:13:36Z action=file.rename_path status=succeeded detail=/tmp/tmp.E2jzGlo5Db/file.txt -> /tmp/tmp.E2jzGlo5Db/renamed.txt
+2026-06-17T16:13:36Z action=file.copy_path status=succeeded detail=/tmp/tmp.E2jzGlo5Db/renamed.txt -> /tmp/tmp.E2jzGlo5Db/copy.txt
+2026-06-17T16:13:36Z action=file.move_path status=succeeded detail=/tmp/tmp.E2jzGlo5Db/copy.txt -> /tmp/tmp.E2jzGlo5Db/moved.txt
+2026-06-17T16:13:36Z action=file.create_tar_gz status=succeeded detail=/tmp/tmp.E2jzGlo5Db/folder -> /tmp/tmp.E2jzGlo5Db/folder.tar.gz
+2026-06-17T16:13:36Z action=file.extract_tar_gz status=succeeded detail=/tmp/tmp.E2jzGlo5Db/folder.tar.gz -> /tmp/tmp.E2jzGlo5Db/tar_extract
+2026-06-17T16:13:36Z action=file.create_zip status=succeeded detail=/tmp/tmp.E2jzGlo5Db/folder -> /tmp/tmp.E2jzGlo5Db/folder.zip
+2026-06-17T16:13:36Z action=file.extract_zip status=succeeded detail=/tmp/tmp.E2jzGlo5Db/folder.zip -> /tmp/tmp.E2jzGlo5Db/zip_extract
+2026-06-17T16:13:36Z action=file.delete_path status=mocked detail=/tmp/tmp.E2jzGlo5Db/moved.txt
+2026-06-17T16:13:36Z action=cron.add_cron_job status=succeeded detail=Demo Task
+2026-06-17T16:13:37Z action=cron.list_cron_jobs status=succeeded detail=listed jobs
+2026-06-17T16:13:37Z action=cron.remove_cron_job status=succeeded detail=Demo Task
+2026-06-17T16:14:00Z action=file.browse_folder status=succeeded detail=/home/duongduy
+2026-06-17T16:15:17Z action=file.create_file status=succeeded detail=/tmp/tmp.tYzWODzQ7A/file.txt
+2026-06-17T16:15:17Z action=file.create_dir status=succeeded detail=/tmp/tmp.tYzWODzQ7A/folder
+2026-06-17T16:15:17Z action=file.browse_folder status=succeeded detail=/tmp/tmp.tYzWODzQ7A
+2026-06-17T16:15:17Z action=file.rename_path status=succeeded detail=/tmp/tmp.tYzWODzQ7A/file.txt -> /tmp/tmp.tYzWODzQ7A/renamed.txt
+2026-06-17T16:15:17Z action=file.copy_path status=succeeded detail=/tmp/tmp.tYzWODzQ7A/renamed.txt -> /tmp/tmp.tYzWODzQ7A/copy.txt
+2026-06-17T16:15:17Z action=file.move_path status=succeeded detail=/tmp/tmp.tYzWODzQ7A/copy.txt -> /tmp/tmp.tYzWODzQ7A/moved.txt
+2026-06-17T16:15:17Z action=file.create_tar_gz status=succeeded detail=/tmp/tmp.tYzWODzQ7A/folder -> /tmp/tmp.tYzWODzQ7A/folder.tar.gz
+2026-06-17T16:15:17Z action=file.extract_tar_gz status=succeeded detail=/tmp/tmp.tYzWODzQ7A/folder.tar.gz -> /tmp/tmp.tYzWODzQ7A/tar_extract
+2026-06-17T16:15:17Z action=file.create_zip status=succeeded detail=/tmp/tmp.tYzWODzQ7A/folder -> /tmp/tmp.tYzWODzQ7A/folder.zip
+2026-06-17T16:15:17Z action=file.extract_zip status=succeeded detail=/tmp/tmp.tYzWODzQ7A/folder.zip -> /tmp/tmp.tYzWODzQ7A/zip_extract
+2026-06-17T16:15:17Z action=file.delete_path status=mocked detail=/tmp/tmp.tYzWODzQ7A/moved.txt
+2026-06-17T16:15:17Z action=cron.add_cron_job status=succeeded detail=Demo Task
+2026-06-17T16:15:17Z action=cron.list_cron_jobs status=succeeded detail=listed jobs
+2026-06-17T16:15:17Z action=cron.remove_cron_job status=succeeded detail=Demo Task
+2026-06-17T16:15:21Z action=file.create_file status=succeeded detail=/tmp/tmp.RJyF2kk1zm/file.txt
+2026-06-17T16:15:21Z action=file.create_dir status=succeeded detail=/tmp/tmp.RJyF2kk1zm/folder
+2026-06-17T16:15:21Z action=file.browse_folder status=succeeded detail=/tmp/tmp.RJyF2kk1zm
+2026-06-17T16:15:21Z action=file.rename_path status=succeeded detail=/tmp/tmp.RJyF2kk1zm/file.txt -> /tmp/tmp.RJyF2kk1zm/renamed.txt
+2026-06-17T16:15:21Z action=file.copy_path status=succeeded detail=/tmp/tmp.RJyF2kk1zm/renamed.txt -> /tmp/tmp.RJyF2kk1zm/copy.txt
+2026-06-17T16:15:21Z action=file.move_path status=succeeded detail=/tmp/tmp.RJyF2kk1zm/copy.txt -> /tmp/tmp.RJyF2kk1zm/moved.txt
+2026-06-17T16:15:21Z action=file.create_tar_gz status=succeeded detail=/tmp/tmp.RJyF2kk1zm/folder -> /tmp/tmp.RJyF2kk1zm/folder.tar.gz
+2026-06-17T16:15:21Z action=file.extract_tar_gz status=succeeded detail=/tmp/tmp.RJyF2kk1zm/folder.tar.gz -> /tmp/tmp.RJyF2kk1zm/tar_extract
+2026-06-17T16:15:21Z action=file.create_zip status=succeeded detail=/tmp/tmp.RJyF2kk1zm/folder -> /tmp/tmp.RJyF2kk1zm/folder.zip
+2026-06-17T16:15:21Z action=file.extract_zip status=succeeded detail=/tmp/tmp.RJyF2kk1zm/folder.zip -> /tmp/tmp.RJyF2kk1zm/zip_extract
+2026-06-17T16:15:21Z action=file.delete_path status=mocked detail=/tmp/tmp.RJyF2kk1zm/moved.txt
+2026-06-17T16:15:21Z action=cron.add_cron_job status=succeeded detail=Demo Task
+2026-06-17T16:15:21Z action=cron.list_cron_jobs status=succeeded detail=listed jobs
+2026-06-17T16:15:22Z action=cron.remove_cron_job status=succeeded detail=Demo Task
+2026-06-17T16:56:44Z action=file.browse_folder status=succeeded detail=/home/duongduy
+2026-06-17T16:56:56Z action=file.browse_folder status=succeeded detail=/home/duongduy/.android
+2026-06-17T16:57:06Z action=file.browse_folder status=succeeded detail=/home/duongduy
+2026-06-17T16:57:10Z action=cron.list_cron_jobs status=succeeded detail=listed jobs
+2026-06-17T17:02:09Z action=file.create_file status=succeeded detail=/tmp/tmp.HhWrW2cfNE/file.txt
+2026-06-17T17:02:09Z action=file.create_dir status=succeeded detail=/tmp/tmp.HhWrW2cfNE/folder
+2026-06-17T17:02:09Z action=file.browse_folder status=succeeded detail=/tmp/tmp.HhWrW2cfNE
+2026-06-17T17:02:09Z action=file.rename_path status=succeeded detail=/tmp/tmp.HhWrW2cfNE/file.txt -> /tmp/tmp.HhWrW2cfNE/renamed.txt
+2026-06-17T17:02:09Z action=file.copy_path status=succeeded detail=/tmp/tmp.HhWrW2cfNE/renamed.txt -> /tmp/tmp.HhWrW2cfNE/copy.txt
+2026-06-17T17:02:09Z action=file.move_path status=succeeded detail=/tmp/tmp.HhWrW2cfNE/copy.txt -> /tmp/tmp.HhWrW2cfNE/moved.txt
+2026-06-17T17:02:09Z action=file.create_tar_gz status=succeeded detail=/tmp/tmp.HhWrW2cfNE/folder -> /tmp/tmp.HhWrW2cfNE/folder.tar.gz
+2026-06-17T17:02:09Z action=file.extract_tar_gz status=succeeded detail=/tmp/tmp.HhWrW2cfNE/folder.tar.gz -> /tmp/tmp.HhWrW2cfNE/tar_extract
+2026-06-17T17:02:09Z action=file.create_zip status=succeeded detail=/tmp/tmp.HhWrW2cfNE/folder -> /tmp/tmp.HhWrW2cfNE/folder.zip
+2026-06-17T17:02:09Z action=file.extract_zip status=succeeded detail=/tmp/tmp.HhWrW2cfNE/folder.zip -> /tmp/tmp.HhWrW2cfNE/zip_extract
+2026-06-17T17:02:09Z action=file.delete_path status=mocked detail=/tmp/tmp.HhWrW2cfNE/moved.txt
+2026-06-17T17:02:09Z action=cron.add_cron_job status=succeeded detail=Demo Task
+2026-06-17T17:02:09Z action=cron.list_cron_jobs status=succeeded detail=listed jobs
+2026-06-17T17:02:10Z action=cron.remove_cron_job status=succeeded detail=Demo Task
+2026-06-17T17:02:14Z action=file.create_file status=succeeded detail=/tmp/tmp.3QKuxbi3U5/file.txt
+2026-06-17T17:02:14Z action=file.create_dir status=succeeded detail=/tmp/tmp.3QKuxbi3U5/folder
+2026-06-17T17:02:14Z action=file.browse_folder status=succeeded detail=/tmp/tmp.3QKuxbi3U5
+2026-06-17T17:02:14Z action=file.rename_path status=succeeded detail=/tmp/tmp.3QKuxbi3U5/file.txt -> /tmp/tmp.3QKuxbi3U5/renamed.txt
+2026-06-17T17:02:14Z action=file.copy_path status=succeeded detail=/tmp/tmp.3QKuxbi3U5/renamed.txt -> /tmp/tmp.3QKuxbi3U5/copy.txt
+2026-06-17T17:02:14Z action=file.move_path status=succeeded detail=/tmp/tmp.3QKuxbi3U5/copy.txt -> /tmp/tmp.3QKuxbi3U5/moved.txt
+2026-06-17T17:02:14Z action=file.create_tar_gz status=succeeded detail=/tmp/tmp.3QKuxbi3U5/folder -> /tmp/tmp.3QKuxbi3U5/folder.tar.gz
+2026-06-17T17:02:14Z action=file.extract_tar_gz status=succeeded detail=/tmp/tmp.3QKuxbi3U5/folder.tar.gz -> /tmp/tmp.3QKuxbi3U5/tar_extract
+2026-06-17T17:02:14Z action=file.create_zip status=succeeded detail=/tmp/tmp.3QKuxbi3U5/folder -> /tmp/tmp.3QKuxbi3U5/folder.zip
+2026-06-17T17:02:14Z action=file.extract_zip status=succeeded detail=/tmp/tmp.3QKuxbi3U5/folder.zip -> /tmp/tmp.3QKuxbi3U5/zip_extract
+2026-06-17T17:02:14Z action=file.delete_path status=mocked detail=/tmp/tmp.3QKuxbi3U5/moved.txt
+2026-06-17T17:02:14Z action=cron.add_cron_job status=succeeded detail=Demo Task
+2026-06-17T17:02:14Z action=cron.list_cron_jobs status=succeeded detail=listed jobs
+2026-06-17T17:02:14Z action=cron.remove_cron_job status=succeeded detail=Demo Task
+2026-06-17T17:03:09Z action=file.browse_folder status=succeeded detail=/home/duongduy
+2026-06-17T17:03:12Z action=cron.list_cron_jobs status=succeeded detail=listed jobs
