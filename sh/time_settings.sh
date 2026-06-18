@@ -12,24 +12,33 @@ need_timedatectl() {
   require_command timedatectl
 }
 
+normalize_toggle_state() {
+  local value="${1:-}"
+  case "${value,,}" in
+    yes|true|1|enabled) echo "enabled" ;;
+    no|false|0|disabled) echo "disabled" ;;
+    *) echo "disabled" ;;
+  esac
+}
+
 get_info() {
   if [[ "${MOCK_MODE:-0}" == "1" ]]; then
     printf '{"local_time":"2026-01-01 12:00:00 UTC","date":"2026-01-01","timezone":"UTC","time_sync":"enabled","utc_time":"2026-01-01 12:00:00 UTC"}\n'
     return
   fi
   need_timedatectl
-  local local_time date_value timezone sync utc_time
+  local local_time date_value timezone sync_enabled sync_fallback utc_time
   local_time="$(date '+%Y-%m-%d %H:%M:%S %Z')"
   date_value="$(date '+%Y-%m-%d')"
   timezone="$(timedatectl show -p Timezone --value 2>/dev/null || true)"
-  sync="$(timedatectl show -p NTPSynchronized --value 2>/dev/null || true)"
+  sync_enabled="$(timedatectl show -p NTP --value 2>/dev/null || true)"
+  sync_fallback="$(timedatectl show -p NTPSynchronized --value 2>/dev/null || true)"
   utc_time="$(date -u '+%Y-%m-%d %H:%M:%S UTC')"
-  [[ "$sync" == "yes" || "$sync" == "true" ]] && sync="enabled" || sync="disabled"
   printf '{"local_time":"%s","date":"%s","timezone":"%s","time_sync":"%s","utc_time":"%s"}\n' \
     "$(json_escape "$local_time")" \
     "$(json_escape "$date_value")" \
     "$(json_escape "${timezone:-Unknown}")" \
-    "$(json_escape "$sync")" \
+    "$(json_escape "$(normalize_toggle_state "${sync_enabled:-$sync_fallback}")")" \
     "$(json_escape "$utc_time")"
 }
 

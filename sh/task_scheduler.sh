@@ -12,6 +12,29 @@ mock_cron_file() {
   printf '%s\n' "$file"
 }
 
+mock_timer_file() {
+  local file="${SYSADMIN_GUI_MOCK_TIMERS:-${SYSADMIN_GUI_MOCK_ROOT:-/tmp}/sysadmin_gui_mock_timers.tsv}"
+  mkdir -p "$(dirname -- "$file")"
+  touch "$file"
+  printf '%s\n' "$file"
+}
+
+systemd_user_dir() {
+  printf '%s\n' "${XDG_CONFIG_HOME:-$HOME/.config}/systemd/user"
+}
+
+systemd_state_dir() {
+  printf '%s\n' "${XDG_STATE_HOME:-$HOME/.local/state}/sysadmin_gui/timers"
+}
+
+timer_unit_name() {
+  local task_name="$1"
+  local slug
+  slug="$(printf '%s' "$task_name" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g; s/-\{2,\}/-/g; s/^-//; s/-$//')"
+  [[ -n "$slug" ]] || slug="task"
+  printf 'sysadmin-gui-%s' "$slug"
+}
+
 read_cron() {
   if [[ "${MOCK_MODE:-0}" == "1" ]]; then
     cat "$(mock_cron_file)"
@@ -44,7 +67,14 @@ validate_cron_expr() {
   [[ "$field_count" == "5" ]] || error_exit "Cron expression must have five fields."
 }
 
-list_cron_jobs() {
+validate_interval_seconds() {
+  local seconds="$1"
+  validate_not_empty "$seconds" "Seconds interval"
+  is_number "$seconds" || error_exit "Seconds interval must be a number."
+  (( seconds >= 1 )) || error_exit "Seconds interval must be at least 1."
+}
+
+list_cron_jobs_only() {
   local lines
   lines="$(read_cron)"
   printf '['
@@ -74,6 +104,63 @@ list_cron_jobs() {
     first=0
   done <<< "$lines"
   printf ']\n'
+}
+
+list_timer_jobs_only() {
+  printf '['
+  local first=1
+  if [[ "${MOCK_MODE:-0}" == "1" ]]; then
+    local line task_name interval_seconds command_text
+    while IFS=$'\t' read -r task_name interval_seconds command_text || [[ -n "${task_name:-}" ]]; do
+      [[ -n "${task_name:-}" ]] || continue
+      if (( first == 0 )); then printf ','; fi
+      printf '{"task_name":"%s","schedule_text":"%s","command":"%s","managed":true,"backend":"systemd","interval_seconds":"%s"}' \
+        "$(json_escape "$task_name")" \
+        "$(json_escape "Every $interval_seconds seconds")" \
+        "$(json_escape "$command_text")" \
+        "$(json_escape "$interval_seconds")"
+      first=0
+    done < "$(mock_timer_file)"
+    printf ']\n'
+    return
+  fi
+
+  local dir service_file timer_file task_name command_text interval_seconds
+  dir="$(systemd_user_dir)"
+  shopt -s nullglob
+  for timer_file in "$dir"/sysadmin-gui-*.timer; do
+    service_file="${timer_file%.timer}.service"
+    [[ -f "$service_file" ]] || continue
+    task_name="$(grep '^# SYSADMIN_GUI_TASK_NAME=' "$service_file" | head -n1 | sed 's/^# SYSADMIN_GUI_TASK_NAME=//' || true)"
+    command_text="$(grep '^# SYSADMIN_GUI_COMMAND=' "$service_file" | head -n1 | sed 's/^# SYSADMIN_GUI_COMMAND=//' || true)"
+    interval_seconds="$(grep '^# SYSADMIN_GUI_INTERVAL_SECONDS=' "$timer_file" | head -n1 | sed 's/^# SYSADMIN_GUI_INTERVAL_SECONDS=//' || true)"
+    [[ -n "$task_name" && -n "$interval_seconds" ]] || continue
+    if (( first == 0 )); then printf ','; fi
+    printf '{"task_name":"%s","schedule_text":"%s","command":"%s","managed":true,"backend":"systemd","interval_seconds":"%s"}' \
+      "$(json_escape "$task_name")" \
+      "$(json_escape "Every $interval_seconds seconds")" \
+      "$(json_escape "$command_text")" \
+      "$(json_escape "$interval_seconds")"
+    first=0
+  done
+  shopt -u nullglob
+  printf ']\n'
+}
+
+list_scheduled_jobs() {
+  local cron_json timer_json
+  cron_json="$(list_cron_jobs_only)"
+  timer_json="$(list_timer_jobs_only)"
+  CRON_JSON="$cron_json" TIMER_JSON="$timer_json" python3 - <<'PY'
+import json
+import os
+
+cron_rows = json.loads(os.environ["CRON_JSON"] or "[]")
+timer_rows = json.loads(os.environ["TIMER_JSON"] or "[]")
+for row in cron_rows:
+    row.setdefault("backend", "cron")
+print(json.dumps(timer_rows + cron_rows, separators=(",", ":")))
+PY
   log_action "cron.list_cron_jobs" "succeeded" "listed jobs"
 }
 
@@ -123,6 +210,107 @@ remove_cron_job() {
   log_action "cron.remove_cron_job" "succeeded" "$task_name"
 }
 
+add_timer_job() {
+  local task_name="$1"
+  local interval_seconds="$2"
+  local command_text="$3"
+  validate_not_empty "$task_name" "Task name"
+  validate_not_empty "$command_text" "Command"
+  validate_no_newline "$task_name" "Task name"
+  validate_no_newline "$command_text" "Command"
+  validate_interval_seconds "$interval_seconds"
+
+  if [[ "${MOCK_MODE:-0}" == "1" ]]; then
+    local temp
+    temp="$(mktemp)"
+    awk -F $'\t' -v name="$task_name" '$1 != name {print}' "$(mock_timer_file)" > "$temp" || true
+    printf '%s\t%s\t%s\n' "$task_name" "$interval_seconds" "$command_text" >> "$temp"
+    mv -- "$temp" "$(mock_timer_file)"
+    log_action "timer.add_timer_job" "mocked" "$task_name"
+    echo "Added second-based scheduled task: $task_name"
+    return
+  fi
+
+  require_command systemctl
+  local user_dir state_dir unit script_file service_file timer_file
+  user_dir="$(systemd_user_dir)"
+  state_dir="$(systemd_state_dir)"
+  unit="$(timer_unit_name "$task_name")"
+  script_file="$state_dir/$unit.sh"
+  service_file="$user_dir/$unit.service"
+  timer_file="$user_dir/$unit.timer"
+  mkdir -p "$user_dir" "$state_dir"
+
+  cat > "$script_file" <<EOF
+#!/usr/bin/env bash
+set -euo pipefail
+$command_text
+EOF
+  chmod +x "$script_file"
+
+  cat > "$service_file" <<EOF
+# SYSADMIN_GUI_TASK_NAME=$task_name
+# SYSADMIN_GUI_COMMAND=$command_text
+[Unit]
+Description=SysAdmin GUI Task: $task_name
+
+[Service]
+Type=oneshot
+ExecStart=$script_file
+EOF
+
+  cat > "$timer_file" <<EOF
+# SYSADMIN_GUI_TASK_NAME=$task_name
+# SYSADMIN_GUI_INTERVAL_SECONDS=$interval_seconds
+[Unit]
+Description=SysAdmin GUI Timer: $task_name
+
+[Timer]
+OnBootSec=${interval_seconds}s
+OnUnitActiveSec=${interval_seconds}s
+Unit=$unit.service
+
+[Install]
+WantedBy=timers.target
+EOF
+
+  systemctl --user daemon-reload
+  systemctl --user enable --now "$unit.timer" >/dev/null
+  log_action "timer.add_timer_job" "succeeded" "$task_name"
+  echo "Added second-based scheduled task: $task_name"
+}
+
+remove_timer_job() {
+  local task_name="$1"
+  validate_not_empty "$task_name" "Task name"
+  validate_no_newline "$task_name" "Task name"
+
+  if [[ "${MOCK_MODE:-0}" == "1" ]]; then
+    local temp
+    temp="$(mktemp)"
+    awk -F $'\t' -v name="$task_name" '$1 != name {print}' "$(mock_timer_file)" > "$temp" || true
+    mv -- "$temp" "$(mock_timer_file)"
+    log_action "timer.remove_timer_job" "mocked" "$task_name"
+    echo "Removed second-based scheduled task: $task_name"
+    return
+  fi
+
+  require_command systemctl
+  local unit user_dir state_dir script_file service_file timer_file
+  unit="$(timer_unit_name "$task_name")"
+  user_dir="$(systemd_user_dir)"
+  state_dir="$(systemd_state_dir)"
+  script_file="$state_dir/$unit.sh"
+  service_file="$user_dir/$unit.service"
+  timer_file="$user_dir/$unit.timer"
+
+  systemctl --user disable --now "$unit.timer" >/dev/null 2>&1 || true
+  rm -f -- "$script_file" "$service_file" "$timer_file"
+  systemctl --user daemon-reload
+  log_action "timer.remove_timer_job" "succeeded" "$task_name"
+  echo "Removed second-based scheduled task: $task_name"
+}
+
 is_number() {
   [[ "${1:-}" =~ ^[0-9]+$ ]]
 }
@@ -146,6 +334,25 @@ build_cron_expression() {
   local month_interval="${7:-1}"
   local custom_expr="${8:-}"
   case "$schedule_type" in
+    "Every N day-of-month"|every_n_day_of_month)
+      validate_range "$interval" "Interval" 1 31
+      validate_range "$minute" "Minute" 0 59
+      validate_range "$hour" "Hour" 0 23
+      printf '%s %s */%s * *\n' "$minute" "$hour" "$interval"
+      ;;
+    "Every N day-of-week"|every_n_day_of_week)
+      validate_range "$interval" "Interval" 1 7
+      validate_range "$minute" "Minute" 0 59
+      validate_range "$hour" "Hour" 0 23
+      printf '%s %s * * */%s\n' "$minute" "$hour" "$interval"
+      ;;
+    "Every N month"|every_n_month)
+      validate_range "$month_interval" "Month interval" 1 12
+      validate_range "$minute" "Minute" 0 59
+      validate_range "$hour" "Hour" 0 23
+      validate_range "$day_of_month" "Day of month" 1 31
+      printf '%s %s %s */%s *\n' "$minute" "$hour" "$day_of_month" "$month_interval"
+      ;;
     "Every N minutes"|every_n_minutes)
       validate_range "$interval" "Interval" 1 59
       printf '*/%s * * * *\n' "$interval"
@@ -201,9 +408,11 @@ ACTION="${1:-}"
 shift || true
 
 case "$ACTION" in
-  list_cron_jobs) list_cron_jobs ;;
+  list_cron_jobs|list_scheduled_jobs) list_scheduled_jobs ;;
   add_cron_job) add_cron_job "${1:-}" "${2:-}" "${3:-}" ;;
   remove_cron_job) remove_cron_job "${1:-}" ;;
+  add_timer_job) add_timer_job "${1:-}" "${2:-}" "${3:-}" ;;
+  remove_timer_job) remove_timer_job "${1:-}" ;;
   build_cron_expression) build_cron_expression "${1:-}" "${2:-0}" "${3:-0}" "${4:-1}" "${5:-1}" "${6:-5}" "${7:-1}" "${8:-}" ;;
   *) error_exit "Unknown action: $ACTION" ;;
 esac
