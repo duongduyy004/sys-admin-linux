@@ -9,11 +9,8 @@ class AboutPage(ttk.Frame):
         self._build()
 
     def _build(self) -> None:
-        ttk.Label(self, text=self.app.tr("About"), style="Header.TLabel").pack(anchor="w")
-        ttk.Label(self, text=self.app.tr("SysAdmin GUI is a Python desktop application backed by safe shell scripts."), style="Subtitle.TLabel").pack(anchor="w", pady=(2, 18))
-
         body = ttk.Frame(self, style="Card.TFrame", padding=18)
-        body.pack(fill="x")
+        body.pack(fill="x", pady=(0, 12))
         text = (
             self.app.tr("SysAdmin GUI provides friendly screens for common Ubuntu administration tasks.")
             + "\n\n"
@@ -24,3 +21,12 @@ class AboutPage(ttk.Frame):
             + self.app.tr("Destructive and privileged actions ask for confirmation before they run.")
         )
         ttk.Label(body, text=text, wraplength=680, justify="left").pack(anchor="w")
+
+        safety = ttk.LabelFrame(self, text=self.app.tr("Safety reminders"), padding=14)
+        safety.pack(fill="x")
+        for line in [
+            "The app stays open after successful or failed actions.",
+            "Shell scripts receive argument lists instead of ad-hoc shell strings.",
+            "Actions that need elevated access ask Ubuntu for permission at run time.",
+        ]:
+            ttk.Label(safety, text=f"• {self.app.tr(line)}", style="Hint.TLabel", wraplength=760, justify="left").pack(anchor="w", pady=2)

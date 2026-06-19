@@ -79,8 +79,8 @@ class MainWindow(ttk.Frame):
         self.root = root
         self.current_page = "Files & Folders"
         self.root.title(tr("SysAdmin GUI"))
-        self.root.geometry("1000x650")
-        self.root.minsize(900, 580)
+        self.root.geometry("1180x760")
+        self.root.minsize(980, 620)
         configure_styles(root)
 
         self.pack(fill="both", expand=True)
@@ -91,35 +91,25 @@ class MainWindow(ttk.Frame):
         main_area = ttk.Frame(self, style="Page.TFrame")
         main_area.pack(side="right", fill="both", expand=True)
 
-        header = ttk.Frame(main_area, style="Page.TFrame", padding=(14, 10, 14, 0))
-        header.pack(fill="x")
-        self.back_button = ttk.Button(header, text=tr("Back to Home"), command=lambda: self.show_page("Home"))
-        self.back_button.pack(side="left")
-        self.breadcrumb_var = tk.StringVar(value=tr("Home"))
-        ttk.Label(header, textvariable=self.breadcrumb_var, style="Subtitle.TLabel").pack(side="left", padx=(12, 0))
-        language_box = ttk.Frame(header, style="Page.TFrame")
-        language_box.pack(side="right")
-        self.language_label = ttk.Label(language_box, text=tr("Language"), style="Subtitle.TLabel")
-        self.language_label.pack(side="left", padx=(0, 8))
-        self.language_var = tk.StringVar(value=LANGUAGE_OPTIONS[get_language()])
-        self.language_combo = ttk.Combobox(
-            language_box,
-            textvariable=self.language_var,
-            values=list(LANGUAGE_OPTIONS.values()),
-            state="readonly",
-            width=12,
-        )
-        self.language_combo.pack(side="left")
-        self.language_combo.bind("<<ComboboxSelected>>", self.change_language)
-
         self.content = ttk.Frame(main_area, style="Page.TFrame")
-        self.content.pack(fill="both", expand=True)
+        self.content.pack(fill="both", expand=True, padx=16, pady=(16, 0))
         self.status_var = tk.StringVar(value=tr("Ready"))
-        ttk.Label(main_area, textvariable=self.status_var, style="Status.TLabel").pack(fill="x", side="bottom")
+        status_frame = ttk.Frame(main_area, style="Surface.TFrame", padding=(12, 10))
+        status_frame.pack(fill="x", side="bottom", padx=16, pady=(12, 16))
+        status_frame.columnconfigure(0, weight=1)
+        ttk.Label(status_frame, textvariable=self.status_var, style="Status.TLabel").grid(row=0, column=0, sticky="ew")
+        ttk.Label(
+            status_frame,
+            text=tr("Tip: use the sidebar to switch features without closing your current window."),
+            style="Hint.TLabel",
+        ).grid(row=0, column=1, sticky="e", padx=(12, 0))
 
         self.pages: dict[str, ttk.Frame] = {}
         self.buttons: dict[str, tk.Button] = {}
         self.sidebar_title: tk.Label | None = None
+        self.sidebar_section_label: tk.Label | None = None
+        self.language_label: ttk.Label | None = None
+        self.language_combo: ttk.Combobox | None = None
         self.exit_button: tk.Button | None = None
 
         self._build_sidebar()
@@ -139,9 +129,19 @@ class MainWindow(ttk.Frame):
         )
         title.pack(fill="x")
         self.sidebar_title = title
+        tk.Label(
+            self.sidebar,
+            text=tr("System tasks"),
+            fg="#cbd5e1",
+            bg=COLORS["sidebar"],
+            font=("DejaVu Sans", 10),
+            anchor="w",
+            padx=18,
+            pady=0,
+        ).pack(fill="x", pady=(0, 10))
+        self.sidebar_section_label = self.sidebar.winfo_children()[-1]
 
         items = [
-            ("🏠", "Home"),
             ("📁", "Files & Folders"),
             ("⏰", "Scheduled Tasks"),
             ("🕐", "Date & Time"),
@@ -155,6 +155,21 @@ class MainWindow(ttk.Frame):
 
         spacer = tk.Frame(self.sidebar, bg=COLORS["sidebar"])
         spacer.pack(fill="both", expand=True)
+        utility = ttk.Frame(self.sidebar, style="Surface.TFrame", padding=10)
+        utility.pack(fill="x", padx=12, pady=(8, 10))
+        self.language_label = ttk.Label(utility, text=tr("Language"), style="Hint.TLabel")
+        self.language_label.pack(anchor="w", pady=(0, 4))
+        self.language_var = tk.StringVar(value=LANGUAGE_OPTIONS[get_language()])
+        self.language_combo = ttk.Combobox(
+            utility,
+            textvariable=self.language_var,
+            values=list(LANGUAGE_OPTIONS.values()),
+            state="readonly",
+            width=12,
+            style="SidebarUtility.TCombobox",
+        )
+        self.language_combo.pack(fill="x")
+        self.language_combo.bind("<<ComboboxSelected>>", self.change_language)
         exit_button = make_sidebar_button(self.sidebar, f"❌ {tr('Exit')}", self.root.destroy)
         exit_button.pack(fill="x", side="bottom")
         self.exit_button = exit_button
@@ -184,11 +199,12 @@ class MainWindow(ttk.Frame):
         self.current_page = name
         page = self.pages[name]
         page.tkraise()
-        self.breadcrumb_var.set(tr("Home") if name == "Home" else f"{tr('Home')} > {tr(name)}")
-        self.back_button.configure(state="disabled" if name == "Home" else "normal")
         self.set_status(tr("{name} is open.", name=tr(name)))
         for page_name, button in self.buttons.items():
-            button.configure(bg=COLORS["sidebar_active"] if page_name == name else COLORS["sidebar"])
+            button.configure(
+                bg=COLORS["sidebar_active"] if page_name == name else COLORS["sidebar"],
+                relief="sunken" if page_name == name else "flat",
+            )
         if hasattr(page, "on_show"):
             page.on_show()
 
@@ -214,8 +230,8 @@ class MainWindow(ttk.Frame):
         set_language(language)
         page_name = self.current_page
         self.root.title(tr("SysAdmin GUI"))
-        self.back_button.configure(text=tr("Back to Home"))
-        self.language_label.configure(text=tr("Language"))
+        if self.language_label is not None:
+            self.language_label.configure(text=tr("Language"))
         self.language_var.set(LANGUAGE_OPTIONS[get_language()])
         self.update_sidebar_text()
         self.rebuild_pages()
@@ -224,6 +240,8 @@ class MainWindow(ttk.Frame):
     def update_sidebar_text(self) -> None:
         if self.sidebar_title is not None:
             self.sidebar_title.configure(text=tr("SysAdmin GUI"))
+        if self.sidebar_section_label is not None:
+            self.sidebar_section_label.configure(text=tr("System tasks"))
         icons = {
             "Home": "🏠",
             "Files & Folders": "📁",

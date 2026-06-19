@@ -26,15 +26,9 @@ class PackageManagerPage(ttk.Frame):
         self._build()
 
     def _build(self) -> None:
-        ttk.Label(self, text=self.app.tr("Software Manager"), style="Header.TLabel").pack(anchor="w")
-        ttk.Label(
-            self,
-            text=self.app.tr("Search Ubuntu software packages and install or remove selected items."),
-            style="Subtitle.TLabel",
-        ).pack(anchor="w", pady=(2, 14))
-
-        search = ttk.Frame(self)
+        search = ttk.Frame(self, style="Card.TFrame", padding=12)
         search.pack(fill="x", pady=(0, 10))
+        ttk.Label(search, text=self.app.tr("Search and source"), style="CardTitle.TLabel").pack(anchor="w", pady=(0, 8))
         ttk.Label(search, text=self.app.tr("Search for software")).pack(side="left", padx=(0, 8))
         self.search_var = tk.StringVar()
         self.search_entry = ttk.Entry(search, textvariable=self.search_var)
@@ -51,8 +45,9 @@ class PackageManagerPage(ttk.Frame):
         ttk.Label(summary, textvariable=self.result_summary_var, font=("DejaVu Sans", 10, "bold")).pack(anchor="w")
         ttk.Label(summary, textvariable=self.selection_summary_var, style="Subtitle.TLabel").pack(anchor="w", pady=(4, 0))
 
-        actions = ttk.Frame(self)
+        actions = ttk.Frame(self, style="Card.TFrame", padding=12)
         actions.pack(fill="x", pady=(0, 10))
+        ttk.Label(actions, text=self.app.tr("Package actions"), style="CardTitle.TLabel").pack(anchor="w", pady=(0, 8))
         self.install_button = ttk.Button(actions, text=self.app.tr("Install"), command=self.install_selected, state="disabled")
         self.install_button.pack(side="left")
         self.remove_button = ttk.Button(actions, text=self.app.tr("Remove"), command=self.remove_selected, style="Danger.TButton", state="disabled")
@@ -61,8 +56,9 @@ class PackageManagerPage(ttk.Frame):
         content = ttk.Frame(self, style="Page.TFrame")
         content.pack(fill="both", expand=True)
 
-        table = ttk.Frame(content)
+        table = ttk.Frame(content, style="Card.TFrame", padding=12)
         table.pack(side="left", fill="both", expand=True)
+        ttk.Label(table, text=self.app.tr("Packages"), style="CardTitle.TLabel").grid(row=0, column=0, sticky="w", pady=(0, 8))
         columns = ("name", "version", "source", "status", "description")
         self.tree = ttk.Treeview(table, columns=columns, show="headings")
         for column, heading, width in [
@@ -83,10 +79,10 @@ class PackageManagerPage(ttk.Frame):
         xscroll = ttk.Scrollbar(table, orient="horizontal", command=self.tree.xview)
         self._yscroll = yscroll
         self.tree.configure(yscrollcommand=self._on_tree_yscroll, xscrollcommand=xscroll.set)
-        self.tree.grid(row=0, column=0, sticky="nsew")
-        yscroll.grid(row=0, column=1, sticky="ns")
-        xscroll.grid(row=1, column=0, sticky="ew")
-        table.rowconfigure(0, weight=1)
+        self.tree.grid(row=1, column=0, sticky="nsew")
+        yscroll.grid(row=1, column=1, sticky="ns")
+        xscroll.grid(row=2, column=0, sticky="ew")
+        table.rowconfigure(1, weight=1)
         table.columnconfigure(0, weight=1)
 
         details = ttk.Frame(content, style="Card.TFrame", padding=14)

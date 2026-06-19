@@ -403,14 +403,18 @@ class TaskSchedulerPage(ttk.Frame):
         self._build()
 
     def _build(self) -> None:
-        ttk.Label(self, text=self.app.tr("Scheduled Tasks"), style="Header.TLabel").pack(anchor="w")
+        summary = ttk.Frame(self, style="Card.TFrame", padding=12)
+        summary.pack(fill="x", pady=(0, 10))
+        ttk.Label(summary, textvariable=self.selected_task_name_var, style="CardTitle.TLabel").pack(anchor="w")
         ttk.Label(
-            self,
-            text=self.app.tr("Friendly scheduling for recurring reminders, scripts, and maintenance tasks."),
-            style="Subtitle.TLabel",
-        ).pack(anchor="w", pady=(2, 14))
+            summary,
+            text=self.app.tr("Use Add Task for new jobs. Remove Task only applies to entries created by this app."),
+            style="Hint.TLabel",
+            wraplength=920,
+            justify="left",
+        ).pack(anchor="w", pady=(4, 0))
 
-        controls = ttk.Frame(self)
+        controls = ttk.Frame(self, style="Card.TFrame", padding=12)
         controls.pack(fill="x", pady=(0, 10))
         ttk.Button(controls, text=self.app.tr("Add Task"), command=self.add_task, style="Accent.TButton").pack(side="left")
         self.remove_button = ttk.Button(controls, text=self.app.tr("Remove Task"), command=self.remove_task, style="Danger.TButton", state="disabled")
@@ -431,8 +435,9 @@ class TaskSchedulerPage(ttk.Frame):
         content.columnconfigure(1, weight=2)
         content.rowconfigure(0, weight=1)
 
-        table_frame = ttk.Frame(content)
+        table_frame = ttk.Frame(content, style="Card.TFrame", padding=12)
         table_frame.grid(row=0, column=0, sticky="nsew", padx=(0, 12))
+        ttk.Label(table_frame, text=self.app.tr("Scheduled jobs"), style="CardTitle.TLabel").grid(row=0, column=0, sticky="w", pady=(0, 8))
         details_frame = ttk.Frame(content, style="Card.TFrame", padding=12)
         details_frame.grid(row=0, column=1, sticky="nsew")
         details_frame.columnconfigure(0, weight=1)
@@ -449,9 +454,9 @@ class TaskSchedulerPage(ttk.Frame):
         self.tree.bind("<<TreeviewSelect>>", lambda _event: self.update_action_states())
         yscroll = ttk.Scrollbar(table_frame, orient="vertical", command=self.tree.yview)
         self.tree.configure(yscrollcommand=yscroll.set)
-        self.tree.grid(row=0, column=0, sticky="nsew")
-        yscroll.grid(row=0, column=1, sticky="ns")
-        table_frame.rowconfigure(0, weight=1)
+        self.tree.grid(row=1, column=0, sticky="nsew")
+        yscroll.grid(row=1, column=1, sticky="ns")
+        table_frame.rowconfigure(1, weight=1)
         table_frame.columnconfigure(0, weight=1)
 
         ttk.Label(details_frame, text=self.app.tr("Task details"), style="Header.TLabel").grid(row=0, column=0, sticky="w")

@@ -116,60 +116,54 @@ class FileManagerPage(ttk.Frame):
         self.sort_reverse = False
         self.selected_action_buttons: list[ttk.Button] = []
         self.path_warning_var = tk.StringVar(value="")
+        self.folder_summary_var = tk.StringVar(value="")
+        self.selection_summary_var = tk.StringVar(value=self.app.tr("No item selected."))
         self._build()
 
     def _build(self) -> None:
-        ttk.Label(self, text=self.app.tr("Files & Folders"), style="Header.TLabel").pack(anchor="w")
-        ttk.Label(
-            self,
-            text=self.app.tr("Browse your folders and manage files safely."),
-            style="Subtitle.TLabel",
-        ).pack(anchor="w", pady=(2, 12))
+        summary = ttk.Frame(self, style="Card.TFrame", padding=12)
+        summary.pack(fill="x", pady=(0, 12))
+        summary.columnconfigure(2, weight=1)
+        tk.Label(summary, text="🗂", bg="#ffffff", fg="#1d4ed8", font=("DejaVu Sans", 24)).grid(row=0, column=0, rowspan=2, sticky="nw", padx=(4, 12))
+        ttk.Label(summary, text=self.app.tr("Current folder:"), style="CardTitle.TLabel").grid(row=0, column=1, sticky="w")
+        folder_row = ttk.Frame(summary, style="Card.TFrame")
+        folder_row.grid(row=0, column=2, sticky="ew", padx=(8, 0))
+        folder_row.columnconfigure(4, weight=1)
+        self.back_folder_button = ttk.Button(folder_row, text=f"←  {self.app.tr('Back')}", command=self.go_back_folder, state="disabled")
+        self.back_folder_button.grid(row=0, column=0, sticky="w")
+        self.forward_folder_button = ttk.Button(folder_row, text=f"→  {self.app.tr('Forward')}", command=self.go_forward_folder, state="disabled")
+        self.forward_folder_button.grid(row=0, column=1, sticky="w", padx=(6, 0))
+        ttk.Button(folder_row, text=f"📁  {self.app.tr('Choose Folder')}", command=self.choose_folder).grid(row=0, column=2, sticky="w", padx=(6, 0))
+        ttk.Label(folder_row, textvariable=self.folder_summary_var, style="Section.TLabel").grid(row=0, column=3, sticky="w", padx=(14, 8))
+        self.folder_var = tk.StringVar(value=self.current_folder)
+        path_entry = ttk.Entry(folder_row, textvariable=self.folder_var)
+        path_entry.grid(row=0, column=4, sticky="ew")
+        path_entry.bind("<Return>", lambda _event: self.go_to_typed_folder())
+        ttk.Button(folder_row, text=self.app.tr("Go To"), command=self.go_to_typed_folder).grid(row=0, column=5, sticky="w", padx=(8, 0))
+        ttk.Button(folder_row, text=f"↑  {self.app.tr('Up')}", command=self.go_up_folder).grid(row=0, column=6, sticky="w", padx=(8, 0))
+        ttk.Button(folder_row, text=f"⟳  {self.app.tr('Refresh')}", command=self.refresh_folder).grid(row=0, column=7, sticky="w", padx=(8, 0))
+        ttk.Label(summary, text=self.app.tr("Selected item:"), style="CardTitle.TLabel").grid(row=1, column=1, sticky="w", pady=(6, 0))
+        ttk.Label(summary, textvariable=self.selection_summary_var, style="Hint.TLabel").grid(row=1, column=2, sticky="w", padx=(8, 0), pady=(6, 0))
+        ttk.Label(summary, textvariable=self.path_warning_var, foreground="#b91c1c").grid(row=2, column=1, columnspan=2, sticky="w", pady=(8, 0))
 
-        self._build_common_folders()
-        self._build_path_bar()
         self._build_actions()
         self._build_table()
         self.update_action_states()
-
-    def _build_common_folders(self) -> None:
-        quick = ttk.LabelFrame(self, text=self.app.tr("Common folders"), padding=8)
-        quick.pack(fill="x", pady=(0, 10))
-        home = Path.home()
-        folders = [("Home", home)]
-        for name in ["Desktop", "Documents", "Downloads", "Pictures", "Videos"]:
-            path = home / name
-            if path.exists():
-                folders.append((name, path))
-        for index, (label, path) in enumerate(folders):
-            ttk.Button(quick, text=self.app.tr(label), command=lambda p=path: self.go_to_folder(str(p))).grid(
-                row=0,
-                column=index,
-                sticky="ew",
-                padx=3,
-            )
-            quick.columnconfigure(index, weight=1)
-
-    def _build_path_bar(self) -> None:
-        path_bar = ttk.Frame(self)
-        path_bar.pack(fill="x", pady=(0, 8))
-        self.back_folder_button = ttk.Button(path_bar, text=f"← {self.app.tr('Back')}", command=self.go_back_folder, state="disabled")
-        self.back_folder_button.pack(side="left", padx=(0, 4))
-        self.forward_folder_button = ttk.Button(path_bar, text=f"{self.app.tr('Forward')} →", command=self.go_forward_folder, state="disabled")
-        self.forward_folder_button.pack(side="left", padx=(0, 4))
-        ttk.Button(path_bar, text=self.app.tr("Up"), command=self.go_up_folder).pack(side="left", padx=(0, 10))
-        ttk.Label(path_bar, text=self.app.tr("Current folder")).pack(side="left", padx=(0, 8))
-        self.folder_var = tk.StringVar(value=self.current_folder)
-        path_entry = ttk.Entry(path_bar, textvariable=self.folder_var)
-        path_entry.pack(side="left", fill="x", expand=True)
-        path_entry.bind("<Return>", lambda _event: self.go_to_typed_folder())
-        ttk.Button(path_bar, text=self.app.tr("Go To"), command=self.go_to_typed_folder).pack(side="left", padx=(8, 0))
-        ttk.Button(path_bar, text=self.app.tr("Choose Folder"), command=self.choose_folder).pack(side="left", padx=(8, 0))
-        ttk.Button(path_bar, text=self.app.tr("Refresh"), command=self.refresh_folder).pack(side="left", padx=(8, 0))
-        ttk.Label(self, textvariable=self.path_warning_var, foreground="#b91c1c").pack(anchor="w", pady=(0, 8))
+        self._update_folder_summary()
 
     def _build_actions(self) -> None:
-        actions = ttk.Frame(self)
+        actions_wrap = ttk.Frame(self, style="Card.TFrame", padding=12)
+        actions_wrap.pack(fill="x", pady=(0, 12))
+        self._section_title(actions_wrap, "⚙", self.app.tr("Actions")).pack(anchor="w")
+        ttk.Label(
+            actions_wrap,
+            text=self.app.tr("Create new items on the left, work with the selected item in the middle, and search or archive on the right."),
+            style="Hint.TLabel",
+            wraplength=920,
+            justify="left",
+        ).pack(anchor="w", pady=(2, 8))
+
+        actions = ttk.Frame(actions_wrap, style="Card.TFrame")
         actions.pack(fill="x", pady=(0, 12))
 
         create_group = ttk.LabelFrame(actions, text=self.app.tr("Create"), padding=8)
@@ -179,15 +173,15 @@ class FileManagerPage(ttk.Frame):
         selected_group.grid(row=0, column=1, sticky="nsew", padx=8)
         search_group.grid(row=0, column=2, sticky="nsew", padx=(8, 0))
 
-        self._button(create_group, self.app.tr("New File"), self.create_file).grid(row=0, column=0, sticky="ew", padx=3, pady=3)
-        self._button(create_group, self.app.tr("New Folder"), self.create_folder).grid(row=0, column=1, sticky="ew", padx=3, pady=3)
+        self._button(create_group, f"📄  {self.app.tr('New File')}", self.create_file).grid(row=0, column=0, sticky="ew", padx=3, pady=3)
+        self._button(create_group, f"📁  {self.app.tr('New Folder')}", self.create_folder).grid(row=0, column=1, sticky="ew", padx=3, pady=3)
 
-        self._button(selected_group, self.app.tr("Rename"), self.rename_item, needs_selection=True).grid(row=0, column=0, sticky="ew", padx=3, pady=3)
-        self._button(selected_group, self.app.tr("Copy"), self.copy_item, needs_selection=True).grid(row=0, column=1, sticky="ew", padx=3, pady=3)
-        self._button(selected_group, self.app.tr("Move"), self.move_item, needs_selection=True).grid(row=0, column=2, sticky="ew", padx=3, pady=3)
-        self._button(selected_group, self.app.tr("Details"), self.details_item, needs_selection=True).grid(row=1, column=0, sticky="ew", padx=3, pady=3)
-        self._button(selected_group, self.app.tr("Change Permissions"), self.permissions, needs_selection=True).grid(row=1, column=1, sticky="ew", padx=3, pady=3)
-        self._button(selected_group, self.app.tr("Delete"), self.delete_item, needs_selection=True, style="Danger.TButton").grid(
+        self._button(selected_group, f"✎  {self.app.tr('Rename')}", self.rename_item, needs_selection=True).grid(row=0, column=0, sticky="ew", padx=3, pady=3)
+        self._button(selected_group, f"⧉  {self.app.tr('Copy')}", self.copy_item, needs_selection=True).grid(row=0, column=1, sticky="ew", padx=3, pady=3)
+        self._button(selected_group, f"⇄  {self.app.tr('Move')}", self.move_item, needs_selection=True).grid(row=0, column=2, sticky="ew", padx=3, pady=3)
+        self._button(selected_group, f"ⓘ  {self.app.tr('Details')}", self.details_item, needs_selection=True).grid(row=1, column=0, sticky="ew", padx=3, pady=3)
+        self._button(selected_group, f"🛡  {self.app.tr('Change Permissions')}", self.permissions, needs_selection=True).grid(row=1, column=1, sticky="ew", padx=3, pady=3)
+        self._button(selected_group, f"🗑  {self.app.tr('Delete')}", self.delete_item, needs_selection=True, style="Danger.TButton").grid(
             row=1,
             column=2,
             sticky="ew",
@@ -195,9 +189,9 @@ class FileManagerPage(ttk.Frame):
             pady=3,
         )
 
-        self._button(search_group, self.app.tr("Search"), self.search_items).grid(row=0, column=0, sticky="ew", padx=3, pady=3)
-        self._button(search_group, self.app.tr("Compress"), self.compress_item, needs_selection=True).grid(row=0, column=1, sticky="ew", padx=3, pady=3)
-        self._button(search_group, self.app.tr("Extract"), self.extract_item, needs_selection=True).grid(row=1, column=1, sticky="ew", padx=3, pady=3)
+        self._button(search_group, f"⌕  {self.app.tr('Search')}", self.search_items).grid(row=0, column=0, sticky="ew", padx=3, pady=3)
+        self._button(search_group, f"🗜  {self.app.tr('Compress')}", self.compress_item, needs_selection=True).grid(row=0, column=1, sticky="ew", padx=3, pady=3)
+        self._button(search_group, f"📤  {self.app.tr('Extract')}", self.extract_item, needs_selection=True).grid(row=1, column=1, sticky="ew", padx=3, pady=3)
 
         for group in [create_group, selected_group, search_group]:
             for column in range(3):
@@ -213,7 +207,18 @@ class FileManagerPage(ttk.Frame):
         return button
 
     def _build_table(self) -> None:
-        table_frame = ttk.Frame(self)
+        table_wrap = ttk.Frame(self, style="Card.TFrame", padding=12)
+        table_wrap.pack(fill="both", expand=True)
+        self._section_title(table_wrap, "🗂", self.app.tr("Folder contents")).pack(anchor="w")
+        ttk.Label(
+            table_wrap,
+            text=self.app.tr("Select a row to enable item actions. Double-click a folder to open it or a file to preview it."),
+            style="Hint.TLabel",
+            wraplength=920,
+            justify="left",
+        ).pack(anchor="w", pady=(2, 10))
+
+        table_frame = ttk.Frame(table_wrap, style="Card.TFrame")
         table_frame.pack(fill="both", expand=True)
         columns = ("name", "type", "size", "permissions", "modified", "path")
         self.tree = ttk.Treeview(table_frame, columns=columns, show="headings")
@@ -240,6 +245,12 @@ class FileManagerPage(ttk.Frame):
         xscroll.grid(row=1, column=0, sticky="ew")
         table_frame.rowconfigure(0, weight=1)
         table_frame.columnconfigure(0, weight=1)
+
+    def _section_title(self, parent: tk.Widget, icon: str, text: str) -> ttk.Frame:
+        frame = ttk.Frame(parent, style="Card.TFrame")
+        ttk.Label(frame, text=icon, style="Section.TLabel").pack(side="left")
+        ttk.Label(frame, text=text, style="Section.TLabel").pack(side="left", padx=(6, 0))
+        return frame
 
     def on_show(self) -> None:
         if not self.tree.get_children():
@@ -319,9 +330,15 @@ class FileManagerPage(ttk.Frame):
         return selected
 
     def update_action_states(self) -> None:
-        state = "normal" if self.selected_path() else "disabled"
+        selected = self.selected_path()
+        state = "normal" if selected else "disabled"
         for button in self.selected_action_buttons:
             button.configure(state=state)
+        if selected:
+            icon = "📁" if self.selected_type() == "folder" else "📄"
+            self.selection_summary_var.set(f"{icon}  {Path(selected).name or selected}")
+        else:
+            self.selection_summary_var.set(self.app.tr("No item selected. Choose a file or folder from the table to enable item actions."))
 
     def open_selected_item(self, _event=None) -> None:
         selected = self.selected_path()
@@ -468,6 +485,7 @@ class FileManagerPage(ttk.Frame):
         self.current_folder = folder
         self.update_path_warning()
         self.update_navigation_buttons()
+        self._update_folder_summary()
         self.app.set_status(self.app.tr("Loading folder: {path}", path=folder))
 
         def update(result: ShellResult) -> None:
@@ -477,6 +495,7 @@ class FileManagerPage(ttk.Frame):
                 return
             rows = parse_json_output(result.stdout, [])
             self.populate(rows)
+            self._update_folder_summary()
             self.app.set_status(self.app.tr("Current folder: {path}", path=self.current_folder))
 
         if show_progress:
@@ -493,12 +512,14 @@ class FileManagerPage(ttk.Frame):
     def render_rows(self) -> None:
         self.tree.delete(*self.tree.get_children())
         for row in self.rows:
+            item_type = row.get("type", "")
+            icon = "📁" if item_type == "folder" else "📄" if item_type == "file" else "•"
             self.tree.insert(
                 "",
                 "end",
                 values=(
-                    row.get("name", ""),
-                    row.get("type", ""),
+                    f"{icon}  {row.get('name', '')}",
+                    item_type,
                     format_size(row.get("size", "")),
                     row.get("permissions", ""),
                     row.get("modified", ""),
@@ -507,6 +528,16 @@ class FileManagerPage(ttk.Frame):
             )
         self.update_column_headings()
         self.update_action_states()
+        self._update_folder_summary()
+
+    def _update_folder_summary(self) -> None:
+        count = len(self.rows)
+        self.folder_summary_var.set(self.current_folder)
+        self.selection_summary_var.set(
+            self.selection_summary_var.get()
+            if self.selected_path()
+            else self.app.tr("Showing {count} items. Choose a file or folder to enable item actions.", count=count)
+        )
 
     def sort_by_column(self, column: str) -> None:
         if self.sort_column == column:

@@ -60,8 +60,16 @@ class TimeSettingsPage(ttk.Frame):
         self._schedule_live_clock()
 
     def _build(self) -> None:
-        ttk.Label(self, text=self.app.tr("Date & Time"), style="Header.TLabel").pack(anchor="w")
-        ttk.Label(self, text=self.app.tr("View time information and change timezone, sync, or manual time settings."), style="Subtitle.TLabel").pack(anchor="w", pady=(2, 14))
+        summary = ttk.Frame(self, style="Card.TFrame", padding=12)
+        summary.pack(fill="x", pady=(0, 12))
+        ttk.Label(summary, text=self.app.tr("Time overview"), style="CardTitle.TLabel").pack(anchor="w")
+        ttk.Label(
+            summary,
+            text=self.app.tr("Refresh first if the clock looks stale, then use the actions below to change timezone, sync, or manual time."),
+            style="Hint.TLabel",
+            wraplength=920,
+            justify="left",
+        ).pack(anchor="w", pady=(4, 0))
 
         info = ttk.Frame(self, style="Card.TFrame", padding=16)
         info.pack(fill="x", pady=(0, 12))
@@ -72,8 +80,9 @@ class TimeSettingsPage(ttk.Frame):
             ttk.Label(info, textvariable=self.values[key]).grid(row=index, column=1, sticky="w", pady=5)
         info.columnconfigure(1, weight=1)
 
-        buttons = ttk.Frame(self)
+        buttons = ttk.Frame(self, style="Card.TFrame", padding=12)
         buttons.pack(fill="x")
+        ttk.Label(buttons, text=self.app.tr("Actions"), style="CardTitle.TLabel").pack(anchor="w", pady=(0, 8))
         ttk.Button(buttons, text=self.app.tr("Refresh"), command=self.refresh).pack(side="left")
         ttk.Button(buttons, text=self.app.tr("Change Time Zone"), command=self.change_timezone).pack(side="left", padx=(8, 0))
         self.sync_button = ttk.Button(buttons, text=self.app.tr("Turn Automatic Time On"), command=self.toggle_sync)
