@@ -26,39 +26,60 @@ class PackageManagerPage(ttk.Frame):
         self._build()
 
     def _build(self) -> None:
-        search = ttk.Frame(self, style="Card.TFrame", padding=12)
-        search.pack(fill="x", pady=(0, 10))
-        ttk.Label(search, text=self.app.tr("Search and source"), style="CardTitle.TLabel").pack(anchor="w", pady=(0, 8))
-        ttk.Label(search, text=self.app.tr("Search for software")).pack(side="left", padx=(0, 8))
-        self.search_var = tk.StringVar()
-        self.search_entry = ttk.Entry(search, textvariable=self.search_var)
-        self.search_entry.pack(side="left", fill="x", expand=True)
-        self.search_var.trace_add("write", self._schedule_search)
-        self.search_entry.bind("<Return>", lambda _event: self._run_search_now())
-        ttk.Button(search, text=self.app.tr("Installed Software"), command=self.list_installed).pack(side="left", padx=(8, 0))
-        ttk.Button(search, text=self.app.tr("Refresh Package Index"), command=self.refresh_package_index).pack(side="left", padx=(8, 0))
-
         summary = ttk.Frame(self, style="Card.TFrame", padding=12)
-        summary.pack(fill="x", pady=(0, 10))
+        summary.pack(fill="x", pady=(0, 12))
+        summary.columnconfigure(2, weight=1)
+        tk.Label(summary, text="📦", bg="#ffffff", fg="#1d4ed8", font=("DejaVu Sans", 24)).grid(row=0, column=0, rowspan=2, sticky="nw", padx=(4, 12))
+        ttk.Label(summary, text=self.app.tr("Software Manager"), style="CardTitle.TLabel").grid(row=0, column=1, sticky="w")
         self.result_summary_var = tk.StringVar(value=self.app.tr("Open Installed Software to see what is already on this computer."))
         self.selection_summary_var = tk.StringVar(value=self.app.tr("Choose a package to see its details and available actions."))
-        ttk.Label(summary, textvariable=self.result_summary_var, font=("DejaVu Sans", 10, "bold")).pack(anchor="w")
-        ttk.Label(summary, textvariable=self.selection_summary_var, style="Subtitle.TLabel").pack(anchor="w", pady=(4, 0))
+        ttk.Label(summary, textvariable=self.result_summary_var, style="Section.TLabel").grid(row=0, column=2, sticky="w", padx=(8, 0))
+        ttk.Label(summary, textvariable=self.selection_summary_var, style="Hint.TLabel", wraplength=880, justify="left").grid(row=1, column=2, sticky="w", padx=(8, 0), pady=(6, 0))
 
-        actions = ttk.Frame(self, style="Card.TFrame", padding=12)
-        actions.pack(fill="x", pady=(0, 10))
-        ttk.Label(actions, text=self.app.tr("Package actions"), style="CardTitle.TLabel").pack(anchor="w", pady=(0, 8))
-        self.install_button = ttk.Button(actions, text=self.app.tr("Install"), command=self.install_selected, state="disabled")
-        self.install_button.pack(side="left")
-        self.remove_button = ttk.Button(actions, text=self.app.tr("Remove"), command=self.remove_selected, style="Danger.TButton", state="disabled")
-        self.remove_button.pack(side="left", padx=(8, 0))
+        controls_wrap = ttk.Frame(self, style="Card.TFrame", padding=12)
+        controls_wrap.pack(fill="x", pady=(0, 12))
+        controls_wrap.columnconfigure(1, weight=1)
+        controls_wrap.columnconfigure(5, weight=1)
+        controls_wrap.columnconfigure(6, weight=1)
+        ttk.Label(controls_wrap, text=self.app.tr("Search and source"), style="CardTitle.TLabel").grid(row=0, column=0, columnspan=5, sticky="w", pady=(0, 8))
+        ttk.Label(controls_wrap, text=self.app.tr("Package actions"), style="CardTitle.TLabel").grid(row=0, column=5, columnspan=2, sticky="w", padx=(14, 0), pady=(0, 8))
+        ttk.Label(controls_wrap, text=self.app.tr("Search for software")).grid(row=1, column=0, sticky="w", padx=(0, 8))
+        self.search_var = tk.StringVar()
+        self.search_entry = ttk.Entry(controls_wrap, textvariable=self.search_var)
+        self.search_entry.grid(row=1, column=1, sticky="ew")
+        self.search_var.trace_add("write", self._schedule_search)
+        self.search_entry.bind("<Return>", lambda _event: self._run_search_now())
+        ttk.Button(controls_wrap, text=self.app.tr("Installed Software"), command=self.list_installed).grid(row=1, column=2, sticky="ew", padx=(8, 0))
+        ttk.Button(controls_wrap, text=self.app.tr("Refresh Package Index"), command=self.refresh_package_index).grid(row=1, column=3, sticky="ew", padx=(8, 0))
+        self.install_button = ttk.Button(controls_wrap, text=self.app.tr("Install"), command=self.install_selected, state="disabled")
+        self.install_button.grid(row=1, column=5, sticky="ew", padx=(14, 0))
+        self.remove_button = ttk.Button(controls_wrap, text=self.app.tr("Remove"), command=self.remove_selected, style="Danger.TButton", state="disabled")
+        self.remove_button.grid(row=1, column=6, sticky="ew", padx=(8, 0))
+        ttk.Label(
+            controls_wrap,
+            text=self.app.tr("Search Ubuntu software packages and install or remove selected items."),
+            style="Hint.TLabel",
+            wraplength=540,
+            justify="left",
+        ).grid(row=2, column=0, columnspan=5, sticky="w", pady=(8, 0))
+        ttk.Label(
+            controls_wrap,
+            text=self.app.tr("Choose a package to see its details and available actions."),
+            style="Hint.TLabel",
+            wraplength=300,
+            justify="left",
+        ).grid(row=2, column=5, columnspan=2, sticky="w", padx=(14, 0), pady=(8, 0))
 
         content = ttk.Frame(self, style="Page.TFrame")
         content.pack(fill="both", expand=True)
+        content.columnconfigure(0, weight=3)
+        content.columnconfigure(1, weight=2)
+        content.rowconfigure(0, weight=1)
 
         table = ttk.Frame(content, style="Card.TFrame", padding=12)
-        table.pack(side="left", fill="both", expand=True)
-        ttk.Label(table, text=self.app.tr("Packages"), style="CardTitle.TLabel").grid(row=0, column=0, sticky="w", pady=(0, 8))
+        table.grid(row=0, column=0, sticky="nsew", padx=(0, 12))
+        ttk.Label(table, text=self.app.tr("Packages"), style="CardTitle.TLabel").grid(row=0, column=0, sticky="w", pady=(0, 2))
+        ttk.Label(table, text=self.app.tr("Search results stay ordered and load in pages as you scroll."), style="Hint.TLabel").grid(row=1, column=0, sticky="w", pady=(0, 8))
         columns = ("name", "version", "source", "status", "description")
         self.tree = ttk.Treeview(table, columns=columns, show="headings")
         for column, heading, width in [
@@ -79,15 +100,21 @@ class PackageManagerPage(ttk.Frame):
         xscroll = ttk.Scrollbar(table, orient="horizontal", command=self.tree.xview)
         self._yscroll = yscroll
         self.tree.configure(yscrollcommand=self._on_tree_yscroll, xscrollcommand=xscroll.set)
-        self.tree.grid(row=1, column=0, sticky="nsew")
-        yscroll.grid(row=1, column=1, sticky="ns")
-        xscroll.grid(row=2, column=0, sticky="ew")
-        table.rowconfigure(1, weight=1)
+        self.tree.grid(row=2, column=0, sticky="nsew")
+        yscroll.grid(row=2, column=1, sticky="ns")
+        xscroll.grid(row=3, column=0, sticky="ew")
+        table.rowconfigure(2, weight=1)
         table.columnconfigure(0, weight=1)
 
         details = ttk.Frame(content, style="Card.TFrame", padding=14)
-        details.pack(side="left", fill="y", padx=(12, 0))
-        ttk.Label(details, text=self.app.tr("Package details"), font=("DejaVu Sans", 11, "bold")).pack(anchor="w")
+        details.grid(row=0, column=1, sticky="nsew")
+        details.columnconfigure(0, weight=1)
+        ttk.Label(details, text=self.app.tr("Package details"), style="CardTitle.TLabel").grid(row=0, column=0, sticky="w")
+        ttk.Label(
+            details,
+            text=self.app.tr("Selected package"),
+            style="Hint.TLabel",
+        ).grid(row=1, column=0, sticky="w", pady=(4, 10))
         self.selected_details = {
             "name": tk.StringVar(value="—"),
             "version": tk.StringVar(value="—"),
@@ -96,16 +123,19 @@ class PackageManagerPage(ttk.Frame):
             "description": tk.StringVar(value=self.app.tr("Choose a package to see its details and available actions.")),
             "next_action": tk.StringVar(value=self.app.tr("No package selected.")),
         }
+        info_grid = ttk.Frame(details, style="Surface.TFrame")
+        info_grid.grid(row=2, column=0, sticky="ew")
+        info_grid.columnconfigure(0, weight=1)
         for label_key, var_key in [("Name", "name"), ("Version", "version"), ("Source", "source"), ("Status", "status")]:
-            row = ttk.Frame(details, style="Card.TFrame")
+            row = ttk.Frame(info_grid, style="Surface.TFrame")
             row.pack(fill="x", pady=(10 if label_key == "Name" else 8, 0))
             ttk.Label(row, text=self.app.tr(label_key), width=10, font=("DejaVu Sans", 10, "bold")).pack(side="left", anchor="nw")
             ttk.Label(row, textvariable=self.selected_details[var_key], wraplength=270, justify="left").pack(side="left", fill="x", expand=True)
 
-        ttk.Label(details, text=self.app.tr("Description"), font=("DejaVu Sans", 10, "bold")).pack(anchor="w", pady=(12, 0))
-        ttk.Label(details, textvariable=self.selected_details["description"], wraplength=320, justify="left").pack(anchor="w", pady=(4, 0))
-        ttk.Label(details, text=self.app.tr("Suggested action"), font=("DejaVu Sans", 10, "bold")).pack(anchor="w", pady=(12, 0))
-        ttk.Label(details, textvariable=self.selected_details["next_action"], wraplength=320, justify="left").pack(anchor="w", pady=(4, 0))
+        ttk.Label(details, text=self.app.tr("Description"), style="Section.TLabel").grid(row=3, column=0, sticky="w", pady=(14, 0))
+        ttk.Label(details, textvariable=self.selected_details["description"], wraplength=320, justify="left").grid(row=4, column=0, sticky="w", pady=(4, 0))
+        ttk.Label(details, text=self.app.tr("Suggested action"), style="Section.TLabel").grid(row=5, column=0, sticky="w", pady=(14, 0))
+        ttk.Label(details, textvariable=self.selected_details["next_action"], wraplength=320, justify="left").grid(row=6, column=0, sticky="w", pady=(4, 0))
 
         self.update_action_states()
 

@@ -1,4 +1,5 @@
 import json
+import re
 import tkinter as tk
 from tkinter import ttk, messagebox
 
@@ -119,11 +120,196 @@ def ask_form(parent: tk.Widget, title: str, fields: list[dict]) -> dict[str, str
     return dialog.result
 
 
+class PermissionFormDialog(tk.Toplevel):
+    _ROLE_ORDER = ("owner", "group", "others")
+    _BIT_ORDER = ("read", "write", "execute")
+    _SYMBOLIC_INDEX = {
+        ("owner", "read"): 0,
+        ("owner", "write"): 1,
+        ("owner", "execute"): 2,
+        ("group", "read"): 3,
+        ("group", "write"): 4,
+        ("group", "execute"): 5,
+        ("others", "read"): 6,
+        ("others", "write"): 7,
+        ("others", "execute"): 8,
+    }
+    _SPECIAL_EXECUTE_CHARS = {
+        "owner": ("s", "S"),
+        "group": ("s", "S"),
+        "others": ("t", "T"),
+    }
+    _SPECIAL_ACTIVE_CHARS = {
+        "owner": ("s",),
+        "group": ("s",),
+        "others": ("t",),
+    }
+    _SPECIAL_BITS = {"owner": 4, "group": 2, "others": 1}
+
+    def __init__(self, parent: tk.Widget, title: str, path: str, current_permissions: str = "") -> None:
+        super().__init__(parent)
+        self.title(title)
+        self.transient(parent)
+        self.grab_set()
+        self.resizable(False, False)
+        self.result: dict[str, str] | None = None
+        self.path = path
+        self.mode_var = tk.StringVar()
+        self.special_var = tk.StringVar(value="0")
+        self.permission_vars: dict[tuple[str, str], tk.BooleanVar] = {}
+
+        body = ttk.Frame(self, padding=16)
+        body.pack(fill="both", expand=True)
+        body.columnconfigure(1, weight=1)
+
+        ttk.Label(body, text=tr("File or folder")).grid(row=0, column=0, sticky="nw", padx=(0, 10), pady=(0, 6))
+        ttk.Label(body, text=path, wraplength=420, style="Subtitle.TLabel").grid(row=0, column=1, sticky="w", pady=(0, 6))
+
+        if current_permissions:
+            ttk.Label(body, text=tr("Current permission")).grid(row=1, column=0, sticky="w", padx=(0, 10), pady=(0, 10))
+            ttk.Label(body, text=current_permissions, style="Subtitle.TLabel").grid(row=1, column=1, sticky="w", pady=(0, 10))
+            table_row = 2
+        else:
+            table_row = 1
+
+        table = ttk.Frame(body)
+        table.grid(row=table_row, column=0, columnspan=2, sticky="ew")
+        ttk.Label(table, text="").grid(row=0, column=0, padx=(0, 12), pady=(0, 6))
+        for column, bit in enumerate(self._BIT_ORDER, start=1):
+            ttk.Label(table, text=tr(bit.title())).grid(row=0, column=column, padx=8, pady=(0, 6))
+
+        for row_index, role in enumerate(self._ROLE_ORDER, start=1):
+            ttk.Label(table, text=tr(role.title())).grid(row=row_index, column=0, sticky="w", padx=(0, 12), pady=4)
+            for column, bit in enumerate(self._BIT_ORDER, start=1):
+                var = tk.BooleanVar(value=False)
+                var.trace_add("write", self._on_permission_change)
+                self.permission_vars[(role, bit)] = var
+                ttk.Checkbutton(table, variable=var).grid(row=row_index, column=column, padx=8, pady=4)
+
+        ttk.Label(body, text=tr("Special bits")).grid(row=table_row + 1, column=0, sticky="w", padx=(0, 10), pady=(12, 6))
+        special_box = ttk.Combobox(body, textvariable=self.special_var, values=[str(index) for index in range(8)], state="readonly", width=6)
+        special_box.grid(row=table_row + 1, column=1, sticky="w", pady=(12, 6))
+        self.special_var.trace_add("write", self._on_permission_change)
+
+        ttk.Label(body, text=tr("0 = regular permissions, 4 = setuid, 2 = setgid, 1 = sticky."), style="Subtitle.TLabel", wraplength=420).grid(
+            row=table_row + 2,
+            column=1,
+            sticky="w",
+            pady=(0, 10),
+        )
+
+        ttk.Label(body, text=tr("Permission number")).grid(row=table_row + 3, column=0, sticky="w", padx=(0, 10), pady=(0, 6))
+        ttk.Label(body, textvariable=self.mode_var, style="CardTitle.TLabel").grid(row=table_row + 3, column=1, sticky="w", pady=(0, 6))
+
+        buttons = ttk.Frame(body)
+        buttons.grid(row=table_row + 4, column=0, columnspan=2, sticky="e", pady=(12, 0))
+        ttk.Button(buttons, text=tr("Cancel"), command=self.destroy).pack(side="right", padx=(8, 0))
+        ttk.Button(buttons, text=tr("Apply"), command=self._submit, style="Accent.TButton").pack(side="right")
+
+        self._load_permissions(current_permissions)
+        self._update_mode()
+        self.bind("<Return>", lambda _event: self._submit())
+        self.bind("<Escape>", lambda _event: self.destroy())
+
+    def _load_permissions(self, current_permissions: str) -> None:
+        mode = current_permissions.strip()
+        if re.fullmatch(r"[0-7]{3,4}", mode):
+            self._load_numeric_mode(mode)
+            return
+
+        symbolic = mode[-9:] if len(mode) >= 9 else ""
+        if len(symbolic) != 9:
+            self._load_numeric_mode("755")
+            return
+
+        special_digit = 0
+        for role in self._ROLE_ORDER:
+            for bit in ("read", "write"):
+                index = self._SYMBOLIC_INDEX[(role, bit)]
+                expected = bit[0]
+                self.permission_vars[(role, bit)].set(symbolic[index] == expected)
+
+            exec_index = self._SYMBOLIC_INDEX[(role, "execute")]
+            exec_char = symbolic[exec_index]
+            self.permission_vars[(role, "execute")].set(exec_char in ("x",) + self._SPECIAL_ACTIVE_CHARS[role])
+            if exec_char in self._SPECIAL_EXECUTE_CHARS[role]:
+                special_digit += self._SPECIAL_BITS[role]
+
+        self.special_var.set(str(special_digit))
+
+    def _load_numeric_mode(self, mode: str) -> None:
+        digits = mode[-3:]
+        special_digit = mode[:-3] or "0"
+        for role, digit in zip(self._ROLE_ORDER, digits):
+            number = int(digit)
+            self.permission_vars[(role, "read")].set(bool(number & 4))
+            self.permission_vars[(role, "write")].set(bool(number & 2))
+            self.permission_vars[(role, "execute")].set(bool(number & 1))
+        self.special_var.set(special_digit)
+
+    def _on_permission_change(self, *_args) -> None:
+        self._update_mode()
+
+    def _update_mode(self) -> None:
+        digits: list[str] = []
+        for role in self._ROLE_ORDER:
+            value = 0
+            if self.permission_vars[(role, "read")].get():
+                value += 4
+            if self.permission_vars[(role, "write")].get():
+                value += 2
+            if self.permission_vars[(role, "execute")].get():
+                value += 1
+            digits.append(str(value))
+        special = self.special_var.get().strip() or "0"
+        self.mode_var.set(f"{special}{''.join(digits)}" if special != "0" else "".join(digits))
+
+    def _submit(self) -> None:
+        self.result = {"path": self.path, "mode": self.mode_var.get()}
+        self.destroy()
+
+
+def ask_permission_form(parent: tk.Widget, title: str, path: str, current_permissions: str = "") -> dict[str, str] | None:
+    dialog = PermissionFormDialog(parent, title, path, current_permissions)
+    parent.wait_window(dialog)
+    return dialog.result
+
+
+def _format_package_repository_error(raw: str) -> str | None:
+    release_match = re.search(r"The repository '([^']+)' does not have a Release file\.", raw)
+    missing_key_match = re.search(r"NO_PUBKEY\s+([A-F0-9]+)", raw)
+    duplicate_matches = re.findall(r"configured multiple times in ([^ ]+) and ([^\s]+)", raw)
+
+    if not (release_match or missing_key_match or duplicate_matches):
+        return None
+
+    lines = [tr("Ubuntu package refresh found repository problems:")]
+    if release_match:
+        lines.append(tr("Unsupported repository: {repo}", repo=release_match.group(1)))
+        lines.append(tr("Disable or remove that repository before refreshing packages again."))
+    if missing_key_match:
+        lines.append(tr("Missing repository signing key: {key}", key=missing_key_match.group(1)))
+        lines.append(tr("Install the missing key or remove that repository if you no longer use it."))
+    if duplicate_matches:
+        seen_pairs: set[tuple[str, str]] = set()
+        for first, second in duplicate_matches:
+            pair = tuple(sorted((first, second)))
+            if pair in seen_pairs:
+                continue
+            seen_pairs.add(pair)
+            lines.append(tr("Duplicate package source entries: {first} and {second}", first=first, second=second))
+        lines.append(tr("Keep only one source entry for each duplicate repository, then refresh again."))
+    return "\n\n".join(lines)
+
+
 def friendly_error_message(stderr: str) -> str:
     raw = (stderr or "").strip()
     lower = raw.lower()
     if not raw:
         return tr("The action could not be completed. Please try again.")
+    package_repo_message = _format_package_repository_error(raw)
+    if package_repo_message:
+        return package_repo_message
     if "permission denied" in lower or "operation not permitted" in lower:
         return tr("You do not have permission to complete this action. Choose a folder you own or approve the Ubuntu permission prompt.")
     if "no such file or directory" in lower or "path does not exist" in lower:

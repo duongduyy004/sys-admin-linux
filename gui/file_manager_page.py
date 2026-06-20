@@ -5,7 +5,7 @@ from pathlib import Path
 import tkinter as tk
 from tkinter import ttk, filedialog, messagebox
 
-from gui.dialogs import ProgressDialog, ask_form, parse_json_output, show_error, show_info
+from gui.dialogs import ProgressDialog, ask_form, ask_permission_form, parse_json_output, show_error, show_info
 from gui.main_window import ShellResult, run_shell_async
 
 
@@ -163,7 +163,7 @@ class FileManagerPage(ttk.Frame):
             justify="left",
         ).pack(anchor="w", pady=(2, 8))
 
-        actions = ttk.Frame(actions_wrap, style="Card.TFrame")
+        actions = ttk.Frame(actions_wrap, style="Surface.TFrame")
         actions.pack(fill="x", pady=(0, 12))
 
         create_group = ttk.LabelFrame(actions, text=self.app.tr("Create"), padding=8)
@@ -247,7 +247,7 @@ class FileManagerPage(ttk.Frame):
         table_frame.columnconfigure(0, weight=1)
 
     def _section_title(self, parent: tk.Widget, icon: str, text: str) -> ttk.Frame:
-        frame = ttk.Frame(parent, style="Card.TFrame")
+        frame = ttk.Frame(parent, style="Surface.TFrame")
         ttk.Label(frame, text=icon, style="Section.TLabel").pack(side="left")
         ttk.Label(frame, text=text, style="Section.TLabel").pack(side="left", padx=(6, 0))
         return frame
@@ -328,6 +328,12 @@ class FileManagerPage(ttk.Frame):
         if not selected:
             messagebox.showwarning(self.app.tr("No item selected"), self.app.tr("Choose a file or folder from the table first."), parent=self)
         return selected
+
+    def selected_row(self) -> dict | None:
+        selected = self.selected_path()
+        if not selected:
+            return None
+        return next((row for row in self.rows if row.get("path") == selected), None)
 
     def update_action_states(self) -> None:
         selected = self.selected_path()
@@ -701,23 +707,21 @@ class FileManagerPage(ttk.Frame):
         selected = self.require_selected_path()
         if not selected:
             return
-        values = ask_form(
-            self,
-            self.app.tr("Change Permissions"),
-            [
-                {"key": "path", "label": self.app.tr("File or folder"), "value": selected},
-                {"key": "mode", "label": self.app.tr("Permission number"), "value": "755"},
-            ],
-        )
+        selected_row = self.selected_row() or {}
+        values = ask_permission_form(self, self.app.tr("Change Permissions"), selected, str(selected_row.get("permissions", "")))
         if not values:
             return
         if not re.fullmatch(r"[0-7]{3,4}", values["mode"]):
             messagebox.showwarning(self.app.tr("Invalid permissions"), self.app.tr("Use 3 or 4 digits from 0 to 7, for example 755."), parent=self)
             return
         if self.validate_path(values["path"], True):
+            current_permission = str(selected_row.get("permissions", "")).strip()
+            permission_summary = f"{self.app.tr('New permission')}: {values['mode']}"
+            if current_permission:
+                permission_summary = f"{self.app.tr('Current permission')}: {current_permission}\n{permission_summary}"
             if messagebox.askyesno(
                 self.app.tr("Permission Confirmation"),
-                f"{self.app.tr('Change permissions for this item?')}\n\n{values['path']}\n\n{self.app.tr('New permission')}: {values['mode']}",
+                f"{self.app.tr('Change permissions for this item?')}\n\n{values['path']}\n\n{permission_summary}",
                 parent=self,
             ):
                 self.run_action(self.app.tr("Change Permissions"), "chmod_path", [values["mode"], values["path"]])

@@ -56,38 +56,72 @@ class TimeSettingsPage(ttk.Frame):
         self.timezone_choices: list[str] = []
         self.current_timezone_id = "Unknown"
         self._clock_after_id: str | None = None
+        self.summary_var = tk.StringVar(value="")
         self._build()
         self._schedule_live_clock()
 
     def _build(self) -> None:
         summary = ttk.Frame(self, style="Card.TFrame", padding=12)
         summary.pack(fill="x", pady=(0, 12))
-        ttk.Label(summary, text=self.app.tr("Time overview"), style="CardTitle.TLabel").pack(anchor="w")
+        summary.columnconfigure(2, weight=1)
+        tk.Label(summary, text="🕒", bg="#ffffff", fg="#1d4ed8", font=("DejaVu Sans", 24)).grid(row=0, column=0, rowspan=2, sticky="nw", padx=(4, 12))
+        ttk.Label(summary, text=self.app.tr("Date & Time"), style="CardTitle.TLabel").grid(row=0, column=1, sticky="w")
+        ttk.Label(summary, textvariable=self.summary_var, style="Section.TLabel").grid(row=0, column=2, sticky="w", padx=(8, 0))
         ttk.Label(
             summary,
             text=self.app.tr("Refresh first if the clock looks stale, then use the actions below to change timezone, sync, or manual time."),
             style="Hint.TLabel",
             wraplength=920,
             justify="left",
-        ).pack(anchor="w", pady=(4, 0))
+        ).grid(row=1, column=2, sticky="w", padx=(8, 0), pady=(6, 0))
 
-        info = ttk.Frame(self, style="Card.TFrame", padding=16)
+        info = ttk.Frame(self, style="Card.TFrame", padding=12)
         info.pack(fill="x", pady=(0, 12))
+        ttk.Label(info, text=self.app.tr("Time overview"), style="CardTitle.TLabel").grid(row=0, column=0, columnspan=2, sticky="w", pady=(0, 2))
+        ttk.Label(
+            info,
+            text=self.app.tr("View time information and change timezone, sync, or manual time settings."),
+            style="Hint.TLabel",
+        ).grid(row=1, column=0, columnspan=2, sticky="w", pady=(0, 10))
         fields = [("local_time", "Local Time"), ("date", "Date"), ("timezone", "Timezone"), ("time_sync", "Time Sync Status"), ("utc_time", "UTC Time")]
-        for index, (key, label) in enumerate(fields):
+        for index, (key, label) in enumerate(fields, start=2):
             self.values[key] = tk.StringVar(value=self.app.tr("Loading..."))
-            ttk.Label(info, text=self.app.tr(label), font=("DejaVu Sans", 10, "bold")).grid(row=index, column=0, sticky="w", pady=5, padx=(0, 18))
-            ttk.Label(info, textvariable=self.values[key]).grid(row=index, column=1, sticky="w", pady=5)
+            ttk.Label(info, text=self.app.tr(label), width=18, font=("DejaVu Sans", 10, "bold")).grid(row=index, column=0, sticky="nw", pady=(0, 8), padx=(0, 14))
+            ttk.Label(info, textvariable=self.values[key], wraplength=660, justify="left").grid(row=index, column=1, sticky="w", pady=(0, 8))
         info.columnconfigure(1, weight=1)
 
-        buttons = ttk.Frame(self, style="Card.TFrame", padding=12)
-        buttons.pack(fill="x")
-        ttk.Label(buttons, text=self.app.tr("Actions"), style="CardTitle.TLabel").pack(anchor="w", pady=(0, 8))
-        ttk.Button(buttons, text=self.app.tr("Refresh"), command=self.refresh).pack(side="left")
-        ttk.Button(buttons, text=self.app.tr("Change Time Zone"), command=self.change_timezone).pack(side="left", padx=(8, 0))
-        self.sync_button = ttk.Button(buttons, text=self.app.tr("Turn Automatic Time On"), command=self.toggle_sync)
-        self.sync_button.pack(side="left", padx=(8, 0))
-        ttk.Button(buttons, text=self.app.tr("Set Date and Time"), command=self.set_datetime).pack(side="left", padx=(8, 0))
+        actions_wrap = ttk.Frame(self, style="Card.TFrame", padding=12)
+        actions_wrap.pack(fill="x")
+        actions_wrap.columnconfigure(0, weight=3)
+        actions_wrap.columnconfigure(1, weight=2)
+
+        quick_actions = ttk.Frame(actions_wrap, style="Surface.TFrame")
+        quick_actions.grid(row=0, column=0, sticky="ew", padx=(0, 12))
+        ttk.Label(quick_actions, text=self.app.tr("Actions"), style="CardTitle.TLabel").grid(row=0, column=0, columnspan=4, sticky="w", pady=(0, 8))
+        ttk.Button(quick_actions, text=self.app.tr("Refresh"), command=self.refresh).grid(row=1, column=0, sticky="w")
+        ttk.Button(quick_actions, text=self.app.tr("Change Time Zone"), command=self.change_timezone).grid(row=1, column=1, sticky="w", padx=(8, 0))
+        self.sync_button = ttk.Button(quick_actions, text=self.app.tr("Turn Automatic Time On"), command=self.toggle_sync)
+        self.sync_button.grid(row=1, column=2, sticky="w", padx=(8, 0))
+        ttk.Button(quick_actions, text=self.app.tr("Set Date and Time"), command=self.set_datetime).grid(row=1, column=3, sticky="w", padx=(8, 0))
+        ttk.Label(
+            quick_actions,
+            text=self.app.tr("The app stays open after successful or failed actions."),
+            style="Hint.TLabel",
+            wraplength=560,
+            justify="left",
+        ).grid(row=2, column=0, columnspan=4, sticky="w", pady=(8, 0))
+
+        status_card = ttk.Frame(actions_wrap, style="Surface.TFrame")
+        status_card.grid(row=0, column=1, sticky="ew")
+        ttk.Label(status_card, text=self.app.tr("Time Sync Status"), style="CardTitle.TLabel").grid(row=0, column=0, sticky="w", pady=(0, 8))
+        ttk.Label(status_card, textvariable=self.values["time_sync"], wraplength=300, justify="left").grid(row=1, column=0, sticky="w")
+        ttk.Label(
+            status_card,
+            text=self.app.tr("Changing system time can affect apps, files, and scheduled tasks. Ubuntu may ask for your administrator password."),
+            style="Hint.TLabel",
+            wraplength=300,
+            justify="left",
+        ).grid(row=2, column=0, sticky="w", pady=(8, 0))
 
     def on_show(self) -> None:
         self.refresh()
@@ -134,6 +168,7 @@ class TimeSettingsPage(ttk.Frame):
                     var.set(self.app.tr(value) if key == "time_sync" or value == "Unknown" else value)
             self._apply_live_clock()
             self.update_sync_button()
+            self._update_summary()
             self.app.set_status(status_message or self.app.tr("Date and time information refreshed."))
 
         run_shell_async("time_settings.sh", "get_info", [], False, lambda result: self.after(0, lambda: update(result)))
@@ -153,6 +188,12 @@ class TimeSettingsPage(ttk.Frame):
         self.values["local_time"].set(now_local.strftime("%Y-%m-%d %H:%M:%S %Z"))
         self.values["date"].set(now_local.strftime("%Y-%m-%d"))
         self.values["utc_time"].set(now_utc.strftime("%Y-%m-%d %H:%M:%S UTC"))
+        self._update_summary()
+
+    def _update_summary(self) -> None:
+        timezone_label = self.values.get("timezone", tk.StringVar(value="")).get() or self.app.tr("Unknown")
+        local_label = self.values.get("local_time", tk.StringVar(value="")).get() or self.app.tr("Loading...")
+        self.summary_var.set(f"{local_label} | {timezone_label}")
 
     def _cancel_live_clock(self) -> None:
         if self._clock_after_id is not None:

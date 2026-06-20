@@ -17,9 +17,7 @@ fi
 
 SOURCE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 TARGET_DIR="/opt/sysadmin_gui"
-
-sudo apt update
-sudo apt install -y python3 python3-tk tree at tar zip unzip libnotify-bin policykit-1
+APT_WARNING=0
 
 sudo mkdir -p "$TARGET_DIR"
 sudo cp -a "$SOURCE_DIR"/. "$TARGET_DIR"/
@@ -27,11 +25,23 @@ sudo chmod +x "$TARGET_DIR"/sh/*.sh
 sudo chmod +x "$TARGET_DIR"/tests/*.sh
 sudo chmod +x "$TARGET_DIR"/install.sh
 
+if ! sudo apt update; then
+  APT_WARNING=1
+  echo "Warning: 'apt update' failed. The project was still copied to $TARGET_DIR." >&2
+  echo "Fix the Ubuntu package repository errors, then rerun the installer if you still need dependency installation." >&2
+fi
+
+if ! sudo apt install -y python3 python3-tk tree at tar zip unzip libnotify-bin policykit-1; then
+  APT_WARNING=1
+  echo "Warning: dependency installation did not complete. The project is present in $TARGET_DIR, but Ubuntu packages may still be missing." >&2
+fi
+
 sudo tee /usr/share/applications/sysadmin-gui.desktop >/dev/null <<'DESKTOP'
 [Desktop Entry]
 Name=SysAdmin GUI
 Comment=Python GUI system administration tool
-Exec=python3 /opt/sysadmin_gui/app.py
+Exec=/usr/bin/python3 /opt/sysadmin_gui/app.py
+TryExec=/usr/bin/python3
 Icon=preferences-system
 Terminal=false
 Type=Application
@@ -40,4 +50,8 @@ DESKTOP
 
 bash "$TARGET_DIR/tests/self_test.sh"
 
-echo "Installation complete. Launch SysAdmin GUI from the desktop menu."
+if [[ "$APT_WARNING" -eq 1 ]]; then
+  echo "Installation finished with package warnings. Launch SysAdmin GUI from the desktop menu after fixing the apt repository issues."
+else
+  echo "Installation complete. Launch SysAdmin GUI from the desktop menu."
+fi
