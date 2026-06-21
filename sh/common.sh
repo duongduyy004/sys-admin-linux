@@ -5,17 +5,17 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 PROJECT_DIR="$(cd "$SCRIPT_DIR/.." && pwd)"
 
 resolve_log_file() {
-  if [[ "$PROJECT_DIR" == "/opt/sysadmin_gui" ]]; then
-    if touch /var/log/sysadmin_gui.log 2>/dev/null; then
-      echo "/var/log/sysadmin_gui.log"
+  if [[ "$PROJECT_DIR" == "/opt/admindesk" ]]; then
+    if touch /var/log/admindesk.log 2>/dev/null; then
+      echo "/var/log/admindesk.log"
       return
     fi
   fi
   mkdir -p "$PROJECT_DIR/logs"
-  echo "$PROJECT_DIR/logs/sysadmin_gui.log"
+  echo "$PROJECT_DIR/logs/admindesk.log"
 }
 
-LOG_FILE="${SYSADMIN_GUI_LOG:-$(resolve_log_file)}"
+LOG_FILE="${ADMINDESK_LOG:-$(resolve_log_file)}"
 
 timestamp_utc() {
   date -u '+%Y-%m-%dT%H:%M:%SZ'
@@ -57,7 +57,7 @@ validate_mock_path() {
   local path="${1:-}"
   [[ "${MOCK_MODE:-0}" == "1" ]] || return 0
   validate_not_empty "$path" "Path"
-  local base="${SYSADMIN_GUI_MOCK_ROOT:-/tmp}"
+  local base="${ADMINDESK_MOCK_ROOT:-/tmp}"
   local full_base full_path
   full_base="$(canonical_path "$base")"
   full_path="$(canonical_path "$path")"

@@ -40,7 +40,7 @@ def run_self_test() -> int:
 
 
 def print_ui_checklist() -> int:
-    print("SysAdmin GUI manual UI/UX checklist")
+    print("AdminDesk manual UI/UX checklist")
     print("=" * 40)
     for item in UI_CHECKLIST:
         print(f"[ ] {item}")

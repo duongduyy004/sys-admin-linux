@@ -40,7 +40,7 @@ class DashboardPage(ttk.Frame):
 
         intro = ttk.Frame(hero, style="Card.TFrame")
         intro.grid(row=0, column=0, sticky="nsew", padx=(0, 18))
-        ttk.Label(intro, text=self.app.tr("SysAdmin GUI"), style="Header.TLabel").pack(anchor="w")
+        ttk.Label(intro, text=self.app.tr("AdminDesk"), style="Header.TLabel").pack(anchor="w")
         ttk.Label(
             intro,
             text=self.app.tr("A simpler front door for common Ubuntu administration tasks."),

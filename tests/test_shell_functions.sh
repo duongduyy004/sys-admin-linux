@@ -6,9 +6,9 @@ cd "$PROJECT_DIR"
 
 export MOCK_MODE=1
 TMP_DIR="$(mktemp -d)"
-export SYSADMIN_GUI_MOCK_ROOT="$TMP_DIR"
-export SYSADMIN_GUI_MOCK_CRONTAB="$TMP_DIR/crontab"
-export SYSADMIN_GUI_MOCK_TIMERS="$TMP_DIR/timers.tsv"
+export ADMINDESK_MOCK_ROOT="$TMP_DIR"
+export ADMINDESK_MOCK_CRONTAB="$TMP_DIR/crontab"
+export ADMINDESK_MOCK_TIMERS="$TMP_DIR/timers.tsv"
 trap 'rm -rf -- "$TMP_DIR"' EXIT
 
 bash -n sh/*.sh
@@ -83,19 +83,19 @@ bash sh/task_scheduler.sh remove_timer_job "Second Task" >/dev/null
 
 real_timer_root="$TMP_DIR/real-timers"
 mkdir -p "$real_timer_root/systemd/user"
-cat > "$real_timer_root/systemd/user/sysadmin-gui-second-task.service" <<'EOF'
-# SYSADMIN_GUI_TASK_NAME=Real Second Task
-# SYSADMIN_GUI_COMMAND=echo real tick
+cat > "$real_timer_root/systemd/user/admindesk-second-task.service" <<'EOF'
+# ADMINDESK_TASK_NAME=Real Second Task
+# ADMINDESK_COMMAND=echo real tick
 [Service]
 Type=oneshot
 ExecStart=/bin/true
 EOF
-cat > "$real_timer_root/systemd/user/sysadmin-gui-second-task.timer" <<'EOF'
-# SYSADMIN_GUI_TASK_NAME=Real Second Task
-# SYSADMIN_GUI_INTERVAL_SECONDS=45
+cat > "$real_timer_root/systemd/user/admindesk-second-task.timer" <<'EOF'
+# ADMINDESK_TASK_NAME=Real Second Task
+# ADMINDESK_INTERVAL_SECONDS=45
 [Timer]
 OnUnitActiveSec=45s
-Unit=sysadmin-gui-second-task.service
+Unit=admindesk-second-task.service
 EOF
 real_scheduled_json="$(XDG_CONFIG_HOME="$real_timer_root" MOCK_MODE=0 bash sh/task_scheduler.sh list_scheduled_jobs)"
 REAL_SCHEDULED_JSON="$real_scheduled_json" python3 - <<'PY'

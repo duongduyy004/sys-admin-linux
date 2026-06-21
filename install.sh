@@ -16,7 +16,9 @@ if [[ -f /etc/os-release ]]; then
 fi
 
 SOURCE_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
-TARGET_DIR="/opt/sysadmin_gui"
+TARGET_DIR="/opt/admindesk"
+LEGACY_TARGET_DIR="/opt/sysadmin_gui"
+LEGACY_DESKTOP_FILE="/usr/share/applications/sysadmin-gui.desktop"
 APT_WARNING=0
 
 sudo mkdir -p "$TARGET_DIR"
@@ -24,6 +26,8 @@ sudo cp -a "$SOURCE_DIR"/. "$TARGET_DIR"/
 sudo chmod +x "$TARGET_DIR"/sh/*.sh
 sudo chmod +x "$TARGET_DIR"/tests/*.sh
 sudo chmod +x "$TARGET_DIR"/install.sh
+sudo rm -rf "$LEGACY_TARGET_DIR"
+sudo rm -f "$LEGACY_DESKTOP_FILE"
 
 if ! sudo apt update; then
   APT_WARNING=1
@@ -36,11 +40,11 @@ if ! sudo apt install -y python3 python3-tk tree at tar zip unzip libnotify-bin 
   echo "Warning: dependency installation did not complete. The project is present in $TARGET_DIR, but Ubuntu packages may still be missing." >&2
 fi
 
-sudo tee /usr/share/applications/sysadmin-gui.desktop >/dev/null <<'DESKTOP'
+sudo tee /usr/share/applications/admindesk.desktop >/dev/null <<'DESKTOP'
 [Desktop Entry]
-Name=SysAdmin GUI
+Name=AdminDesk
 Comment=Python GUI system administration tool
-Exec=/usr/bin/python3 /opt/sysadmin_gui/app.py
+Exec=/usr/bin/python3 /opt/admindesk/app.py
 TryExec=/usr/bin/python3
 Icon=preferences-system
 Terminal=false
@@ -51,7 +55,7 @@ DESKTOP
 bash "$TARGET_DIR/tests/self_test.sh"
 
 if [[ "$APT_WARNING" -eq 1 ]]; then
-  echo "Installation finished with package warnings. Launch SysAdmin GUI from the desktop menu after fixing the apt repository issues."
+  echo "Installation finished with package warnings. Launch AdminDesk from the desktop menu after fixing the apt repository issues."
 else
-  echo "Installation complete. Launch SysAdmin GUI from the desktop menu."
+  echo "Installation complete. Launch AdminDesk from the desktop menu."
 fi

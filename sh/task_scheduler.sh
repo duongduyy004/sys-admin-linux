@@ -6,14 +6,14 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/common.sh"
 
 mock_cron_file() {
-  local file="${SYSADMIN_GUI_MOCK_CRONTAB:-${SYSADMIN_GUI_MOCK_ROOT:-/tmp}/sysadmin_gui_mock_crontab}"
+  local file="${ADMINDESK_MOCK_CRONTAB:-${ADMINDESK_MOCK_ROOT:-/tmp}/admindesk_mock_crontab}"
   mkdir -p "$(dirname -- "$file")"
   touch "$file"
   printf '%s\n' "$file"
 }
 
 mock_timer_file() {
-  local file="${SYSADMIN_GUI_MOCK_TIMERS:-${SYSADMIN_GUI_MOCK_ROOT:-/tmp}/sysadmin_gui_mock_timers.tsv}"
+  local file="${ADMINDESK_MOCK_TIMERS:-${ADMINDESK_MOCK_ROOT:-/tmp}/admindesk_mock_timers.tsv}"
   mkdir -p "$(dirname -- "$file")"
   touch "$file"
   printf '%s\n' "$file"
@@ -24,7 +24,7 @@ systemd_user_dir() {
 }
 
 systemd_state_dir() {
-  printf '%s\n' "${XDG_STATE_HOME:-$HOME/.local/state}/sysadmin_gui/timers"
+  printf '%s\n' "${XDG_STATE_HOME:-$HOME/.local/state}/admindesk/timers"
 }
 
 timer_unit_name() {
@@ -32,7 +32,7 @@ timer_unit_name() {
   local slug
   slug="$(printf '%s' "$task_name" | tr '[:upper:]' '[:lower:]' | sed 's/[^a-z0-9]/-/g; s/-\{2,\}/-/g; s/^-//; s/-$//')"
   [[ -n "$slug" ]] || slug="task"
-  printf 'sysadmin-gui-%s' "$slug"
+  printf 'admindesk-%s' "$slug"
 }
 
 read_cron() {
@@ -80,8 +80,8 @@ list_cron_jobs_only() {
   printf '['
   local first=1 pending_name="" line expr command_text managed name
   while IFS= read -r line || [[ -n "$line" ]]; do
-    if [[ "$line" == "# SYSADMIN_GUI: "* ]]; then
-      pending_name="${line#"# SYSADMIN_GUI: "}"
+    if [[ "$line" == "# ADMINDESK: "* ]]; then
+      pending_name="${line#"# ADMINDESK: "}"
       continue
     fi
     [[ -n "$line" ]] || continue
@@ -128,12 +128,12 @@ list_timer_jobs_only() {
   local dir service_file timer_file task_name command_text interval_seconds
   dir="$(systemd_user_dir)"
   shopt -s nullglob
-  for timer_file in "$dir"/sysadmin-gui-*.timer; do
+  for timer_file in "$dir"/admindesk-*.timer; do
     service_file="${timer_file%.timer}.service"
     [[ -f "$service_file" ]] || continue
-    task_name="$(grep '^# SYSADMIN_GUI_TASK_NAME=' "$service_file" | head -n1 | sed 's/^# SYSADMIN_GUI_TASK_NAME=//' || true)"
-    command_text="$(grep '^# SYSADMIN_GUI_COMMAND=' "$service_file" | head -n1 | sed 's/^# SYSADMIN_GUI_COMMAND=//' || true)"
-    interval_seconds="$(grep '^# SYSADMIN_GUI_INTERVAL_SECONDS=' "$timer_file" | head -n1 | sed 's/^# SYSADMIN_GUI_INTERVAL_SECONDS=//' || true)"
+    task_name="$(grep '^# ADMINDESK_TASK_NAME=' "$service_file" | head -n1 | sed 's/^# ADMINDESK_TASK_NAME=//' || true)"
+    command_text="$(grep '^# ADMINDESK_COMMAND=' "$service_file" | head -n1 | sed 's/^# ADMINDESK_COMMAND=//' || true)"
+    interval_seconds="$(grep '^# ADMINDESK_INTERVAL_SECONDS=' "$timer_file" | head -n1 | sed 's/^# ADMINDESK_INTERVAL_SECONDS=//' || true)"
     [[ -n "$task_name" && -n "$interval_seconds" ]] || continue
     if (( first == 0 )); then printf ','; fi
     printf '{"task_name":"%s","schedule_text":"%s","command":"%s","managed":true,"backend":"systemd","interval_seconds":"%s"}' \
@@ -176,7 +176,7 @@ add_cron_job() {
 
   local temp current marker
   temp="$(mktemp)"
-  marker="# SYSADMIN_GUI: $task_name"
+  marker="# ADMINDESK: $task_name"
   current="$(read_cron)"
   awk -v marker="$marker" 'skip_next {skip_next=0; next} $0 == marker {skip_next=1; next} {print}' <<< "$current" > "$temp"
   {
@@ -195,7 +195,7 @@ remove_cron_job() {
   validate_no_newline "$task_name" "Task name"
   local temp current marker before after
   temp="$(mktemp)"
-  marker="# SYSADMIN_GUI: $task_name"
+  marker="# ADMINDESK: $task_name"
   current="$(read_cron)"
   before="$(grep -Fxc "$marker" <<< "$current" || true)"
   awk -v marker="$marker" 'skip_next {skip_next=0; next} $0 == marker {skip_next=1; next} {print}' <<< "$current" > "$temp"
@@ -249,10 +249,10 @@ EOF
   chmod +x "$script_file"
 
   cat > "$service_file" <<EOF
-# SYSADMIN_GUI_TASK_NAME=$task_name
-# SYSADMIN_GUI_COMMAND=$command_text
+# ADMINDESK_TASK_NAME=$task_name
+# ADMINDESK_COMMAND=$command_text
 [Unit]
-Description=SysAdmin GUI Task: $task_name
+Description=AdminDesk Task: $task_name
 
 [Service]
 Type=oneshot
@@ -260,10 +260,10 @@ ExecStart=$script_file
 EOF
 
   cat > "$timer_file" <<EOF
-# SYSADMIN_GUI_TASK_NAME=$task_name
-# SYSADMIN_GUI_INTERVAL_SECONDS=$interval_seconds
+# ADMINDESK_TASK_NAME=$task_name
+# ADMINDESK_INTERVAL_SECONDS=$interval_seconds
 [Unit]
-Description=SysAdmin GUI Timer: $task_name
+Description=AdminDesk Timer: $task_name
 
 [Timer]
 OnBootSec=${interval_seconds}s

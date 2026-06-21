@@ -94,8 +94,8 @@ group_cron_expressions() {
   export MOCK_MODE=1
   local tmp
   tmp="$(mktemp -d)"
-  export SYSADMIN_GUI_MOCK_ROOT="$tmp"
-  export SYSADMIN_GUI_MOCK_CRONTAB="$tmp/crontab"
+  export ADMINDESK_MOCK_ROOT="$tmp"
+  export ADMINDESK_MOCK_CRONTAB="$tmp/crontab"
   local status=0
   [[ "$(bash sh/task_scheduler.sh build_cron_expression every_n_minutes 0 0 1 1 5)" == "*/5 * * * *" ]] || status=1
   [[ "$(bash sh/task_scheduler.sh build_cron_expression hourly 30 0 1 1 5)" == "30 * * * *" ]] || status=1

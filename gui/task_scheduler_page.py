@@ -664,7 +664,7 @@ class TaskSchedulerPage(ttk.Frame):
             self.run_action(self.app.tr("Remove Task"), action, [task_name])
 
     def view_logs(self) -> None:
-        log_path = "logs/sysadmin_gui.log"
+        log_path = "logs/admindesk.log"
         try:
             with open(log_path, "r", encoding="utf-8") as handle:
                 content = handle.read()[-12000:]

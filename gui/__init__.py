@@ -1,1 +1,1 @@
-"""SysAdmin GUI package."""
+"""AdminDesk package."""

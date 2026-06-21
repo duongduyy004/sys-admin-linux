@@ -1,6 +1,6 @@
-# SysAdmin GUI
+# AdminDesk
 
-SysAdmin GUI is a single-window Ubuntu administration tool built with Python 3, Tkinter, ttk, and shell backends. It opens on a simple Home dashboard, keeps a fixed left sidebar visible, and changes the right content area between Files & Folders, Scheduled Tasks, Date & Time, Software Manager, and About.
+AdminDesk is a single-window Ubuntu administration tool built with Python 3, Tkinter, ttk, and shell backends. It opens on a simple Home dashboard, keeps a fixed left sidebar visible, and changes the right content area between Files & Folders, Scheduled Tasks, Date & Time, Software Manager, and About.
 
 ## Architecture
 
@@ -30,10 +30,10 @@ Run from the project folder:
 bash install.sh
 ```
 
-The installer installs dependencies, copies the project to `/opt/sysadmin_gui`, creates a desktop launcher, and runs the self-test. The desktop menu entry is:
+The installer installs dependencies, copies the project to `/opt/admindesk`, creates a desktop launcher, and runs the self-test. The desktop menu entry is:
 
 ```text
-SysAdmin GUI
+AdminDesk
 ```
 
 ## How To Run
@@ -47,7 +47,7 @@ python3 app.py
 After installation, use the desktop menu entry or run:
 
 ```bash
-python3 /opt/sysadmin_gui/app.py
+python3 /opt/admindesk/app.py
 ```
 
 ## Self-Test
@@ -72,5 +72,5 @@ python3 app.py --ui-checklist
 - If the app does not open, install Tkinter with `sudo apt install python3-tk`.
 - If root actions fail, make sure `pkexec` and PolicyKit are installed.
 - If package search returns no results, run `sudo apt update`.
-- If logs are missing, check `logs/sysadmin_gui.log` in the development folder or `/var/log/sysadmin_gui.log` after installation.
-- In mock mode, file operations are restricted to the test directory set by `SYSADMIN_GUI_MOCK_ROOT`.
+- If logs are missing, check `logs/admindesk.log` in the development folder or `/var/log/admindesk.log` after installation.
+- In mock mode, file operations are restricted to the test directory set by `ADMINDESK_MOCK_ROOT`.

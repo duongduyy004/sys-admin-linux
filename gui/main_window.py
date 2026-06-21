@@ -78,7 +78,7 @@ class MainWindow(ttk.Frame):
         super().__init__(root)
         self.root = root
         self.current_page = "Files & Folders"
-        self.root.title(tr("SysAdmin GUI"))
+        self.root.title(tr("AdminDesk"))
         self.root.geometry("1180x760")
         self.root.minsize(980, 620)
         configure_styles(root)
@@ -119,7 +119,7 @@ class MainWindow(ttk.Frame):
     def _build_sidebar(self) -> None:
         title = tk.Label(
             self.sidebar,
-            text=tr("SysAdmin GUI"),
+            text=tr("AdminDesk"),
             fg="#ffffff",
             bg=COLORS["sidebar"],
             font=("DejaVu Sans", 16, "bold"),
@@ -229,7 +229,7 @@ class MainWindow(ttk.Frame):
             return
         set_language(language)
         page_name = self.current_page
-        self.root.title(tr("SysAdmin GUI"))
+        self.root.title(tr("AdminDesk"))
         if self.language_label is not None:
             self.language_label.configure(text=tr("Language"))
         self.language_var.set(LANGUAGE_OPTIONS[get_language()])
@@ -239,7 +239,7 @@ class MainWindow(ttk.Frame):
 
     def update_sidebar_text(self) -> None:
         if self.sidebar_title is not None:
-            self.sidebar_title.configure(text=tr("SysAdmin GUI"))
+            self.sidebar_title.configure(text=tr("AdminDesk"))
         if self.sidebar_section_label is not None:
             self.sidebar_section_label.configure(text=tr("System tasks"))
         icons = {

@@ -12,7 +12,7 @@ class AboutPage(ttk.Frame):
         body = ttk.Frame(self, style="Card.TFrame", padding=18)
         body.pack(fill="x", pady=(0, 12))
         text = (
-            self.app.tr("SysAdmin GUI provides friendly screens for common Ubuntu administration tasks.")
+            self.app.tr("AdminDesk provides friendly screens for common Ubuntu administration tasks.")
             + "\n\n"
             + self.app.tr("The window, sidebar, forms, tables, confirmations, progress views, and validation are handled by Python and Tkinter.")
             + " "
