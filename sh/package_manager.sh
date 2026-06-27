@@ -102,7 +102,7 @@ list_installed() {
     return
   fi
   printf '['
-  local first=1 count=0 line name version desc tracking publisher notes
+  local first=1 line name version desc tracking publisher notes
   local -A apt_descriptions=()
 
   if has_command dpkg-query; then
@@ -125,12 +125,10 @@ list_installed() {
         "$(json_escape "$version")" \
         "$(json_escape "$desc")"
       first=0
-      count=$((count + 1))
-      (( count >= 500 )) && break
     done < <(apt list --installed 2>/dev/null | tail -n +2)
   fi
 
-  if has_command snap && (( count < 500 )); then
+  if has_command snap; then
     while IFS=$'\t' read -r name version tracking publisher notes; do
       [[ -n "$name" ]] || continue
       desc="Track: ${tracking:-unknown}"
@@ -142,8 +140,6 @@ list_installed() {
         "$(json_escape "$version")" \
         "$(json_escape "$desc")"
       first=0
-      count=$((count + 1))
-      (( count >= 500 )) && break
     done < <(snap list 2>/dev/null | awk 'NR>1 {print $1 "\t" $2 "\t" $4 "\t" $5 "\t" $6}')
   fi
 

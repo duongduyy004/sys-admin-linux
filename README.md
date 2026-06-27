@@ -14,7 +14,7 @@ Tkinter is available on Ubuntu through `python3-tk`, is lightweight, and support
 
 ## Features
 
-- Create, delete, rename, copy, move, browse, search, compress, extract, and change permissions for files and folders.
+- Create, delete, rename, copy, cut, paste, browse, search, compress, extract, and change permissions for files and folders.
 - List, add, and remove app-created cron jobs.
 - View local time, UTC time, timezone, and sync status.
 - Change timezone, toggle time sync, and set date/time with root confirmation.

@@ -115,6 +115,9 @@ class FileManagerPage(ttk.Frame):
         self.sort_column = "name"
         self.sort_reverse = False
         self.selected_action_buttons: list[ttk.Button] = []
+        self.paste_button: ttk.Button | None = None
+        self.clipboard_path = ""
+        self.clipboard_mode = ""
         self.path_warning_var = tk.StringVar(value="")
         self.folder_summary_var = tk.StringVar(value="")
         self.selection_summary_var = tk.StringVar(value=self.app.tr("No item selected."))
@@ -178,15 +181,18 @@ class FileManagerPage(ttk.Frame):
 
         self._button(selected_group, f"✎  {self.app.tr('Rename')}", self.rename_item, needs_selection=True).grid(row=0, column=0, sticky="ew", padx=3, pady=3)
         self._button(selected_group, f"⧉  {self.app.tr('Copy')}", self.copy_item, needs_selection=True).grid(row=0, column=1, sticky="ew", padx=3, pady=3)
-        self._button(selected_group, f"⇄  {self.app.tr('Move')}", self.move_item, needs_selection=True).grid(row=0, column=2, sticky="ew", padx=3, pady=3)
+        self._button(selected_group, f"✂  {self.app.tr('Cut')}", self.cut_item, needs_selection=True).grid(row=0, column=2, sticky="ew", padx=3, pady=3)
         self._button(selected_group, f"ⓘ  {self.app.tr('Details')}", self.details_item, needs_selection=True).grid(row=1, column=0, sticky="ew", padx=3, pady=3)
         self._button(selected_group, f"🛡  {self.app.tr('Change Permissions')}", self.permissions, needs_selection=True).grid(row=1, column=1, sticky="ew", padx=3, pady=3)
+        self.paste_button = self._button(selected_group, f"📋  {self.app.tr('Paste')}", self.paste_item)
+        self.paste_button.grid(row=1, column=2, sticky="ew", padx=3, pady=3)
         self._button(selected_group, f"🗑  {self.app.tr('Delete')}", self.delete_item, needs_selection=True, style="Danger.TButton").grid(
-            row=1,
-            column=2,
+            row=2,
+            column=0,
+            columnspan=3,
             sticky="ew",
             padx=3,
-            pady=3,
+            pady=(3, 0),
         )
 
         self._button(search_group, f"⌕  {self.app.tr('Search')}", self.search_items).grid(row=0, column=0, sticky="ew", padx=3, pady=3)
@@ -340,6 +346,8 @@ class FileManagerPage(ttk.Frame):
         state = "normal" if selected else "disabled"
         for button in self.selected_action_buttons:
             button.configure(state=state)
+        if self.paste_button:
+            self.paste_button.configure(state="normal" if self.clipboard_path else "disabled")
         if selected:
             icon = "📁" if self.selected_type() == "folder" else "📄"
             self.selection_summary_var.set(f"{icon}  {Path(selected).name or selected}")
@@ -635,33 +643,85 @@ class FileManagerPage(ttk.Frame):
         selected = self.require_selected_path()
         if not selected:
             return
-        default = os.path.join(self.folder_var.get(), f"Copy of {Path(selected).name}")
-        values = ask_form(
-            self,
-            self.app.tr("Copy Item"),
-            [
-                {"key": "src", "label": self.app.tr("Copy from"), "value": selected},
-                {"key": "dest", "label": self.app.tr("New copy path"), "value": default},
-            ],
-        )
-        if values and self.validate_path(values["src"], True) and self.validate_destination(values["dest"], "new copy path"):
-            self.run_action(self.app.tr("Copy Item"), "copy_path", [values["src"], values["dest"]])
+        if not self.validate_path(selected, True):
+            return
+        self.clipboard_path = selected
+        self.clipboard_mode = "copy"
+        self.update_action_states()
+        self.app.set_status(self.app.tr("Copied to clipboard: {path}", path=selected))
 
-    def move_item(self) -> None:
+    def cut_item(self) -> None:
         selected = self.require_selected_path()
         if not selected:
             return
+        if not self.validate_path(selected, True):
+            return
+        self.clipboard_path = selected
+        self.clipboard_mode = "cut"
+        self.update_action_states()
+        self.app.set_status(self.app.tr("Ready to move: {path}", path=selected))
+
+    def paste_item(self) -> None:
+        if not self.clipboard_path or self.clipboard_mode not in {"copy", "cut"}:
+            messagebox.showwarning(self.app.tr("Clipboard is empty"), self.app.tr("Choose Copy or Cut on a file or folder first."), parent=self)
+            return
+        if not self.validate_path(self.clipboard_path, True):
+            self.clipboard_path = ""
+            self.clipboard_mode = ""
+            self.update_action_states()
+            return
+        destination_folder = self.paste_destination_folder()
+        if not self.validate_destination(destination_folder, "destination folder", must_not_exist=False, folder_destination=True):
+            return
+        default = os.path.join(destination_folder, Path(self.clipboard_path).name)
         values = ask_form(
             self,
-            self.app.tr("Move Item"),
+            self.app.tr("Paste Item"),
             [
-                {"key": "src", "label": self.app.tr("Move from"), "value": selected},
-                {"key": "dest", "label": self.app.tr("Move to"), "value": ""},
+                {"key": "src", "label": self.app.tr("Paste from"), "value": self.clipboard_path},
+                {"key": "dest", "label": self.app.tr("Paste to"), "value": default},
             ],
         )
-        if values and self.validate_path(values["src"], True) and self.validate_destination(values["dest"], "move destination"):
-            if messagebox.askyesno(self.app.tr("Move Confirmation"), f"{self.app.tr('Move this item?')}\n\n{values['src']}\n\n{self.app.tr('to')}\n\n{values['dest']}", parent=self):
-                self.run_action(self.app.tr("Move Item"), "move_path", [values["src"], values["dest"]])
+        if not values or not self.validate_path(values["src"], True) or not self.validate_destination(values["dest"], "paste destination"):
+            return
+        same_path = canonical(values["src"]) == canonical(values["dest"])
+        if same_path:
+            messagebox.showwarning(self.app.tr("Already exists"), self.app.tr("A file or folder already exists there. Choose a different name."), parent=self)
+            return
+        if self.clipboard_mode == "cut":
+            if not messagebox.askyesno(
+                self.app.tr("Move Confirmation"),
+                f"{self.app.tr('Move this item?')}\n\n{values['src']}\n\n{self.app.tr('to')}\n\n{values['dest']}",
+                parent=self,
+            ):
+                return
+            self.run_action(
+                self.app.tr("Paste Item"),
+                "move_path",
+                [values["src"], values["dest"]],
+                on_success=lambda result: self._finish_paste(result, clear_clipboard=True),
+            )
+            return
+        self.run_action(
+            self.app.tr("Paste Item"),
+            "copy_path",
+            [values["src"], values["dest"]],
+            on_success=lambda result: self._finish_paste(result, clear_clipboard=False),
+        )
+
+    def paste_destination_folder(self) -> str:
+        selected = self.selected_path()
+        selected_type = self.selected_type()
+        if selected and selected_type == "folder":
+            return selected
+        return self.folder_var.get().strip() or self.current_folder
+
+    def _finish_paste(self, result: ShellResult, clear_clipboard: bool) -> None:
+        if clear_clipboard:
+            self.clipboard_path = ""
+            self.clipboard_mode = ""
+        self.refresh_folder(show_progress=False)
+        self.update_action_states()
 
     def search_items(self) -> None:
         values = ask_form(

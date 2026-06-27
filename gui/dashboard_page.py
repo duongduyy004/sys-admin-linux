@@ -6,7 +6,7 @@ FEATURES = [
     (
         "Files & Folders",
         "📁",
-        "Create, copy, move, search, compress, and safely delete files.",
+        "Create, copy, cut, paste, search, compress, and safely delete files.",
     ),
     (
         "Scheduled Tasks",
