@@ -41,7 +41,7 @@ def run_shell(script_name: str, action: str, args: list[str] | None = None, requ
     """
     script_path = SH_DIR / script_name
     command = ["bash", str(script_path), action, *(args or [])]
-    if require_root and os.environ.get("MOCK_MODE") != "1":
+    if require_root:
         command = ["pkexec", *command]
     result = subprocess.run(
         command,
@@ -62,7 +62,7 @@ def run_shell_async(
 ) -> None:
     script_path = SH_DIR / script_name
     command = ["bash", str(script_path), action, *(args or [])]
-    if require_root and os.environ.get("MOCK_MODE") != "1":
+    if require_root:
         command = ["pkexec", *command]
 
     def worker() -> None:

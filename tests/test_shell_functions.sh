@@ -4,14 +4,28 @@ set -euo pipefail
 PROJECT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 cd "$PROJECT_DIR"
 
-export MOCK_MODE=1
 TMP_DIR="$(mktemp -d)"
-export ADMINDESK_MOCK_ROOT="$TMP_DIR"
-export ADMINDESK_MOCK_CRONTAB="$TMP_DIR/crontab"
-export ADMINDESK_MOCK_TIMERS="$TMP_DIR/timers.tsv"
+export ADMINDESK_CRONTAB_FILE="$TMP_DIR/crontab"
+export ADMINDESK_TIMER_STORE_FILE="$TMP_DIR/timers.tsv"
 trap 'rm -rf -- "$TMP_DIR"' EXIT
 
 bash -n sh/*.sh
+
+fake_bin="$TMP_DIR/fake-bin"
+mkdir -p "$fake_bin"
+cat > "$fake_bin/gio" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+if [[ "${1:-}" == "trash" ]]; then
+  shift
+  [[ "${1:-}" == "--" ]] && shift
+  rm -rf -- "$@"
+  exit 0
+fi
+exit 1
+EOF
+chmod +x "$fake_bin/gio"
+export PATH="$fake_bin:$PATH"
 
 bash sh/file_manager.sh create_file "$TMP_DIR/file.txt" >/dev/null
 [[ -f "$TMP_DIR/file.txt" ]]
@@ -97,7 +111,7 @@ cat > "$real_timer_root/systemd/user/admindesk-second-task.timer" <<'EOF'
 OnUnitActiveSec=45s
 Unit=admindesk-second-task.service
 EOF
-real_scheduled_json="$(XDG_CONFIG_HOME="$real_timer_root" MOCK_MODE=0 bash sh/task_scheduler.sh list_scheduled_jobs)"
+real_scheduled_json="$(env -u ADMINDESK_TIMER_STORE_FILE -u ADMINDESK_CRONTAB_FILE XDG_CONFIG_HOME="$real_timer_root" bash sh/task_scheduler.sh list_scheduled_jobs)"
 REAL_SCHEDULED_JSON="$real_scheduled_json" python3 - <<'PY'
 import json
 import os
@@ -109,8 +123,6 @@ assert second_task["schedule_text"] == "Every 45 seconds"
 assert second_task["command"] == "echo real tick"
 PY
 
-fake_bin="$TMP_DIR/fake-bin"
-mkdir -p "$fake_bin"
 cat > "$fake_bin/apt-cache" <<'EOF'
 #!/usr/bin/env bash
 set -euo pipefail
@@ -151,7 +163,7 @@ fi
 exit 1
 EOF
 chmod +x "$fake_bin/dpkg-query"
-search_json="$(PATH="$fake_bin:$PATH" MOCK_MODE=0 bash sh/package_manager.sh search_packages app)"
+search_json="$(PATH="$fake_bin:$PATH" bash sh/package_manager.sh search_packages app)"
 SEARCH_JSON="$search_json" python3 - <<'PY'
 import json
 import os
@@ -168,7 +180,7 @@ assert rows == [
 ]
 PY
 
-all_search_json="$(PATH="$fake_bin:$PATH" MOCK_MODE=0 bash sh/package_manager.sh search_packages '')"
+all_search_json="$(PATH="$fake_bin:$PATH" bash sh/package_manager.sh search_packages '')"
 ALL_SEARCH_JSON="$all_search_json" python3 - <<'PY'
 import json
 import os
@@ -195,7 +207,7 @@ if [[ "${1:-}" == "list" ]]; then
 fi
 EOF
 chmod +x "$fake_bin/snap"
-list_json="$(PATH="$fake_bin:$PATH" MOCK_MODE=0 bash sh/package_manager.sh list_installed)"
+list_json="$(PATH="$fake_bin:$PATH" bash sh/package_manager.sh list_installed)"
 LIST_JSON="$list_json" python3 - <<'PY'
 import json
 import os

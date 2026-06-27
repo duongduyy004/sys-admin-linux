@@ -20,7 +20,6 @@ Tkinter is available on Ubuntu through `python3-tk`, is lightweight, and support
 - Change timezone, toggle time sync, and set date/time with root confirmation.
 - Search packages, list installed packages, install selected packages, and remove selected packages.
 - Switch the interface between English and Vietnamese from the top bar.
-- Mock mode for safe self-testing with `MOCK_MODE=1`.
 
 ## Installation
 
@@ -73,4 +72,4 @@ python3 app.py --ui-checklist
 - If root actions fail, make sure `pkexec` and PolicyKit are installed.
 - If package search returns no results, run `sudo apt update`.
 - If logs are missing, check `logs/admindesk.log` in the development folder or `/var/log/admindesk.log` after installation.
-- In mock mode, file operations are restricted to the test directory set by `ADMINDESK_MOCK_ROOT`.
+- Test scripts use dedicated override files and fake system commands so self-tests do not touch your real crontab or package tools.

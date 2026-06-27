@@ -16,11 +16,6 @@ has_command() {
 }
 
 apt_update_if_needed() {
-  if [[ "${MOCK_MODE:-0}" == "1" ]]; then
-    log_action "apt.update_if_needed" "mocked" "mock update"
-    echo "Mock mode: package index would be checked."
-    return
-  fi
   require_command apt
   local stamp="/var/lib/apt/periodic/update-success-stamp"
   if [[ -f "$stamp" ]] && find "$stamp" -mtime -1 -print -quit | grep -q .; then
@@ -69,10 +64,6 @@ search_package_names() {
 
 search_packages() {
   local query="$1"
-  if [[ "${MOCK_MODE:-0}" == "1" ]]; then
-    printf '[{"name":"demo-package","version":"1.0","status":"Available","description":"Mock package result for %s","manager":"APT"}]\n' "$(json_escape "$query")"
-    return
-  fi
   require_command apt-cache
   require_command dpkg-query
   printf '['
@@ -97,10 +88,6 @@ search_packages() {
 }
 
 list_installed() {
-  if [[ "${MOCK_MODE:-0}" == "1" ]]; then
-    printf '[{"name":"python3","version":"3.x","status":"Installed","description":"Mock APT package","manager":"APT"},{"name":"snap-store","version":"1.x","status":"Installed","description":"Mock Snap package","manager":"Snap"}]\n'
-    return
-  fi
   printf '['
   local first=1 line name version desc tracking publisher notes
   local -A apt_descriptions=()
@@ -150,11 +137,6 @@ list_installed() {
 install_package() {
   local package="$1"
   validate_package_name "$package"
-  if [[ "${MOCK_MODE:-0}" == "1" ]]; then
-    log_action "apt.install_package" "mocked" "$package"
-    echo "Mock mode: package would be installed: $package"
-    return
-  fi
   require_command apt
   DEBIAN_FRONTEND=noninteractive apt install -y -- "$package"
   log_action "apt.install_package" "succeeded" "$package"
@@ -165,11 +147,6 @@ remove_package() {
   local manager="${1:-APT}"
   local package="${2:-}"
   validate_package_name "$package"
-  if [[ "${MOCK_MODE:-0}" == "1" ]]; then
-    log_action "pkg.remove_package" "mocked" "$manager:$package"
-    echo "Mock mode: package would be removed from $manager: $package"
-    return
-  fi
   case "${manager^^}" in
     APT)
       require_command apt

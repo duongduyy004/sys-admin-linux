@@ -53,24 +53,9 @@ canonical_path() {
   realpath -m -- "$path" 2>/dev/null || printf '%s\n' "$path"
 }
 
-validate_mock_path() {
-  local path="${1:-}"
-  [[ "${MOCK_MODE:-0}" == "1" ]] || return 0
-  validate_not_empty "$path" "Path"
-  local base="${ADMINDESK_MOCK_ROOT:-/tmp}"
-  local full_base full_path
-  full_base="$(canonical_path "$base")"
-  full_path="$(canonical_path "$path")"
-  case "$full_path" in
-    "$full_base"|"$full_base"/*) return 0 ;;
-    *) error_exit "Mock mode allows file changes only inside: $full_base" ;;
-  esac
-}
-
 validate_safe_delete_path() {
   local path="${1:-}"
   validate_path_exists "$path"
-  validate_mock_path "$path"
   local full
   full="$(canonical_path "$path")"
   case "$full" in

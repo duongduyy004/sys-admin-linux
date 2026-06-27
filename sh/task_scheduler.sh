@@ -5,15 +5,17 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 # shellcheck source=common.sh
 source "$SCRIPT_DIR/common.sh"
 
-mock_cron_file() {
-  local file="${ADMINDESK_MOCK_CRONTAB:-${ADMINDESK_MOCK_ROOT:-/tmp}/admindesk_mock_crontab}"
+cron_file_override() {
+  local file="${ADMINDESK_CRONTAB_FILE:-}"
+  [[ -n "$file" ]] || return 1
   mkdir -p "$(dirname -- "$file")"
   touch "$file"
   printf '%s\n' "$file"
 }
 
-mock_timer_file() {
-  local file="${ADMINDESK_MOCK_TIMERS:-${ADMINDESK_MOCK_ROOT:-/tmp}/admindesk_mock_timers.tsv}"
+timer_store_override() {
+  local file="${ADMINDESK_TIMER_STORE_FILE:-}"
+  [[ -n "$file" ]] || return 1
   mkdir -p "$(dirname -- "$file")"
   touch "$file"
   printf '%s\n' "$file"
@@ -36,20 +38,20 @@ timer_unit_name() {
 }
 
 read_cron() {
-  if [[ "${MOCK_MODE:-0}" == "1" ]]; then
-    cat "$(mock_cron_file)"
-  else
-    crontab -l 2>/dev/null || true
+  if cron_file_override >/dev/null; then
+    cat "$(cron_file_override)"
+    return
   fi
+  crontab -l 2>/dev/null || true
 }
 
 write_cron_file() {
   local file="$1"
-  if [[ "${MOCK_MODE:-0}" == "1" ]]; then
-    cp -- "$file" "$(mock_cron_file)"
-  else
-    crontab "$file"
+  if cron_file_override >/dev/null; then
+    cp -- "$file" "$(cron_file_override)"
+    return
   fi
+  crontab "$file"
 }
 
 validate_no_newline() {
@@ -109,7 +111,7 @@ list_cron_jobs_only() {
 list_timer_jobs_only() {
   printf '['
   local first=1
-  if [[ "${MOCK_MODE:-0}" == "1" ]]; then
+  if timer_store_override >/dev/null; then
     local line task_name interval_seconds command_text
     while IFS=$'\t' read -r task_name interval_seconds command_text || [[ -n "${task_name:-}" ]]; do
       [[ -n "${task_name:-}" ]] || continue
@@ -120,7 +122,7 @@ list_timer_jobs_only() {
         "$(json_escape "$command_text")" \
         "$(json_escape "$interval_seconds")"
       first=0
-    done < "$(mock_timer_file)"
+    done < "$(timer_store_override)"
     printf ']\n'
     return
   fi
@@ -220,13 +222,13 @@ add_timer_job() {
   validate_no_newline "$command_text" "Command"
   validate_interval_seconds "$interval_seconds"
 
-  if [[ "${MOCK_MODE:-0}" == "1" ]]; then
+  if timer_store_override >/dev/null; then
     local temp
     temp="$(mktemp)"
-    awk -F $'\t' -v name="$task_name" '$1 != name {print}' "$(mock_timer_file)" > "$temp" || true
+    awk -F $'\t' -v name="$task_name" '$1 != name {print}' "$(timer_store_override)" > "$temp" || true
     printf '%s\t%s\t%s\n' "$task_name" "$interval_seconds" "$command_text" >> "$temp"
-    mv -- "$temp" "$(mock_timer_file)"
-    log_action "timer.add_timer_job" "mocked" "$task_name"
+    mv -- "$temp" "$(timer_store_override)"
+    log_action "timer.add_timer_job" "succeeded" "$task_name"
     echo "Added second-based scheduled task: $task_name"
     return
   fi
@@ -285,12 +287,12 @@ remove_timer_job() {
   validate_not_empty "$task_name" "Task name"
   validate_no_newline "$task_name" "Task name"
 
-  if [[ "${MOCK_MODE:-0}" == "1" ]]; then
+  if timer_store_override >/dev/null; then
     local temp
     temp="$(mktemp)"
-    awk -F $'\t' -v name="$task_name" '$1 != name {print}' "$(mock_timer_file)" > "$temp" || true
-    mv -- "$temp" "$(mock_timer_file)"
-    log_action "timer.remove_timer_job" "mocked" "$task_name"
+    awk -F $'\t' -v name="$task_name" '$1 != name {print}' "$(timer_store_override)" > "$temp" || true
+    mv -- "$temp" "$(timer_store_override)"
+    log_action "timer.remove_timer_job" "succeeded" "$task_name"
     echo "Removed second-based scheduled task: $task_name"
     return
   fi

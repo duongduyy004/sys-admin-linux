@@ -91,11 +91,10 @@ group_file_operations() {
 }
 
 group_cron_expressions() {
-  export MOCK_MODE=1
   local tmp
   tmp="$(mktemp -d)"
-  export ADMINDESK_MOCK_ROOT="$tmp"
-  export ADMINDESK_MOCK_CRONTAB="$tmp/crontab"
+  export ADMINDESK_CRONTAB_FILE="$tmp/crontab"
+  export ADMINDESK_TIMER_STORE_FILE="$tmp/timers.tsv"
   local status=0
   [[ "$(bash sh/task_scheduler.sh build_cron_expression every_n_minutes 0 0 1 1 5)" == "*/5 * * * *" ]] || status=1
   [[ "$(bash sh/task_scheduler.sh build_cron_expression hourly 30 0 1 1 5)" == "30 * * * *" ]] || status=1
@@ -103,6 +102,7 @@ group_cron_expressions() {
   [[ "$(bash sh/task_scheduler.sh build_cron_expression weekly 0 9 1 1 5)" == "0 9 * * 1" ]] || status=1
   [[ "$(bash sh/task_scheduler.sh build_cron_expression monthly 0 0 1 1 5)" == "0 0 1 * *" ]] || status=1
   rm -rf -- "$tmp"
+  unset ADMINDESK_CRONTAB_FILE ADMINDESK_TIMER_STORE_FILE
   return "$status"
 }
 

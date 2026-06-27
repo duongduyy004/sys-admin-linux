@@ -6,9 +6,6 @@ SCRIPT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")" && pwd)"
 source "$SCRIPT_DIR/common.sh"
 
 need_timedatectl() {
-  if [[ "${MOCK_MODE:-0}" == "1" ]]; then
-    return 0
-  fi
   require_command timedatectl
 }
 
@@ -22,10 +19,6 @@ normalize_toggle_state() {
 }
 
 get_info() {
-  if [[ "${MOCK_MODE:-0}" == "1" ]]; then
-    printf '{"local_time":"2026-01-01 12:00:00 UTC","date":"2026-01-01","timezone":"UTC","time_sync":"enabled","utc_time":"2026-01-01 12:00:00 UTC"}\n'
-    return
-  fi
   need_timedatectl
   local local_time date_value timezone sync_enabled sync_fallback utc_time
   local_time="$(date '+%Y-%m-%d %H:%M:%S %Z')"
@@ -43,10 +36,6 @@ get_info() {
 }
 
 list_timezones() {
-  if [[ "${MOCK_MODE:-0}" == "1" ]]; then
-    printf '["UTC","Asia/Ho_Chi_Minh","America/New_York"]\n'
-    return
-  fi
   need_timedatectl
   printf '['
   local first=1 zone
@@ -63,11 +52,6 @@ set_timezone() {
   local timezone="$1"
   validate_not_empty "$timezone" "Timezone"
   validate_no_newline_time "$timezone" "Timezone"
-  if [[ "${MOCK_MODE:-0}" == "1" ]]; then
-    log_action "time.set_timezone" "mocked" "$timezone"
-    echo "Mock mode: timezone would be changed to $timezone"
-    return
-  fi
   need_timedatectl
   timedatectl set-timezone "$timezone"
   log_action "time.set_timezone" "succeeded" "$timezone"
@@ -81,11 +65,6 @@ toggle_ntp() {
     off|false|disabled) state=false ;;
     *) error_exit "Time sync value must be on or off." ;;
   esac
-  if [[ "${MOCK_MODE:-0}" == "1" ]]; then
-    log_action "time.toggle_ntp" "mocked" "$state"
-    echo "Mock mode: time sync would be set to $state"
-    return
-  fi
   need_timedatectl
   timedatectl set-ntp "$state"
   log_action "time.toggle_ntp" "succeeded" "$state"
@@ -103,11 +82,6 @@ set_datetime() {
   validate_not_empty "$datetime" "Date and time"
   validate_no_newline_time "$datetime" "Date and time"
   [[ "$datetime" =~ ^[0-9]{4}-[0-9]{2}-[0-9]{2}[[:space:]][0-9]{2}:[0-9]{2}:[0-9]{2}$ ]] || error_exit "Use date and time format: YYYY-MM-DD HH:MM:SS"
-  if [[ "${MOCK_MODE:-0}" == "1" ]]; then
-    log_action "time.set_datetime" "mocked" "$datetime"
-    echo "Mock mode: date and time would be changed to $datetime"
-    return
-  fi
   need_timedatectl
   timedatectl set-time "$datetime"
   log_action "time.set_datetime" "succeeded" "$datetime"

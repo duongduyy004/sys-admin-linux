@@ -46,7 +46,6 @@ path_entry_size_bytes() {
 create_file() {
   local path="$1"
   validate_not_empty "$path" "File path"
-  validate_mock_path "$path"
   parent_must_exist "$path"
   [[ ! -e "$path" ]] || error_exit "A file or folder already exists at: $path"
   : > "$path"
@@ -57,7 +56,6 @@ create_file() {
 create_dir() {
   local path="$1"
   validate_not_empty "$path" "Folder path"
-  validate_mock_path "$path"
   parent_must_exist "$path"
   [[ ! -e "$path" ]] || error_exit "A file or folder already exists at: $path"
   mkdir -- "$path"
@@ -68,12 +66,6 @@ create_dir() {
 delete_path() {
   local path="$1"
   validate_safe_delete_path "$path"
-  if [[ "${MOCK_MODE:-0}" == "1" ]]; then
-    rm -rf -- "$path"
-    log_action "file.delete_path" "mocked" "$path"
-    echo "Removed in test mode: $path"
-    return
-  fi
   if command_exists gio; then
     gio trash -- "$path"
     log_action "file.delete_path" "succeeded" "$path"
@@ -88,8 +80,6 @@ rename_path() {
   local new_path="$2"
   validate_path_exists "$old_path"
   validate_not_empty "$new_path" "New path"
-  validate_mock_path "$old_path"
-  validate_mock_path "$new_path"
   parent_must_exist "$new_path"
   [[ ! -e "$new_path" ]] || error_exit "Destination already exists: $new_path"
   mv -- "$old_path" "$new_path"
@@ -102,8 +92,6 @@ copy_path() {
   local dest="$2"
   validate_path_exists "$src"
   validate_not_empty "$dest" "Destination"
-  validate_mock_path "$src"
-  validate_mock_path "$dest"
   parent_must_exist "$dest"
   [[ ! -e "$dest" ]] || error_exit "Destination already exists: $dest"
   cp -a -- "$src" "$dest"
@@ -116,8 +104,6 @@ move_path() {
   local dest="$2"
   validate_path_exists "$src"
   validate_not_empty "$dest" "Destination"
-  validate_mock_path "$src"
-  validate_mock_path "$dest"
   parent_must_exist "$dest"
   [[ ! -e "$dest" ]] || error_exit "Destination already exists: $dest"
   mv -- "$src" "$dest"
@@ -155,7 +141,6 @@ search_files() {
   validate_path_exists "$base_dir"
   [[ -d "$base_dir" ]] || error_exit "Search location must be a folder."
   validate_not_empty "$query" "Search text"
-  validate_mock_path "$base_dir"
 
   local find_type=()
   case "$search_type" in
@@ -182,7 +167,6 @@ browse_folder() {
   local base_dir="$1"
   validate_path_exists "$base_dir"
   [[ -d "$base_dir" ]] || error_exit "Browse location must be a folder."
-  validate_mock_path "$base_dir"
   printf '['
   local first=1 item
   while IFS= read -r -d '' item; do
@@ -197,7 +181,6 @@ browse_folder() {
 get_stat() {
   local path="$1"
   validate_path_exists "$path"
-  validate_mock_path "$path"
   local type size perms owner group modified
   type="$(path_type "$path")"
   size="$(path_size_bytes "$path")"
@@ -221,7 +204,6 @@ chmod_path() {
   local path="$2"
   [[ "$mode" =~ ^[0-7]{3,4}$ ]] || error_exit "Permission mode must be 3 or 4 octal digits."
   validate_path_exists "$path"
-  validate_mock_path "$path"
   chmod -- "$mode" "$path"
   log_action "file.chmod_path" "succeeded" "$mode $path"
   echo "Updated permissions for: $path"
@@ -232,8 +214,6 @@ create_tar_gz() {
   local dest="$2"
   validate_path_exists "$src"
   validate_not_empty "$dest" "Archive path"
-  validate_mock_path "$src"
-  validate_mock_path "$dest"
   parent_must_exist "$dest"
   [[ ! -e "$dest" ]] || error_exit "Archive already exists: $dest"
   tar -czf "$dest" -C "$(dirname -- "$src")" "$(basename -- "$src")"
@@ -246,8 +226,6 @@ extract_tar_gz() {
   local dest_dir="$2"
   validate_path_exists "$archive"
   validate_not_empty "$dest_dir" "Destination folder"
-  validate_mock_path "$archive"
-  validate_mock_path "$dest_dir"
   mkdir -p -- "$dest_dir"
   tar -xzf "$archive" -C "$dest_dir"
   log_action "file.extract_tar_gz" "succeeded" "$archive -> $dest_dir"
@@ -259,8 +237,6 @@ create_zip() {
   local dest="$2"
   validate_path_exists "$src"
   validate_not_empty "$dest" "Zip path"
-  validate_mock_path "$src"
-  validate_mock_path "$dest"
   parent_must_exist "$dest"
   [[ ! -e "$dest" ]] || error_exit "Zip file already exists: $dest"
   local dest_abs
@@ -280,8 +256,6 @@ extract_zip() {
   local dest_dir="$2"
   validate_path_exists "$archive"
   validate_not_empty "$dest_dir" "Destination folder"
-  validate_mock_path "$archive"
-  validate_mock_path "$dest_dir"
   mkdir -p -- "$dest_dir"
   if command_exists unzip; then
     unzip -q "$archive" -d "$dest_dir"
