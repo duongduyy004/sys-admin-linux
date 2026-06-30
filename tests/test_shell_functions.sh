@@ -32,6 +32,10 @@ bash sh/file_manager.sh create_file "$TMP_DIR/file.txt" >/dev/null
 printf 'hello world' > "$TMP_DIR/file.txt"
 file_size="$(bash sh/file_manager.sh get_stat "$TMP_DIR/file.txt" | python3 -c 'import json, sys; print(json.load(sys.stdin)["size"])')"
 [[ "$file_size" == "11" ]]
+printf 'edited content\n' > "$TMP_DIR/edit-source.txt"
+bash sh/file_manager.sh save_file_from_temp "$TMP_DIR/edit-source.txt" "$TMP_DIR/file.txt" >/dev/null
+[[ "$(cat "$TMP_DIR/file.txt")" == "edited content" ]]
+[[ ! -e "$TMP_DIR/edit-source.txt" ]]
 bash sh/file_manager.sh create_dir "$TMP_DIR/folder" >/dev/null
 [[ -d "$TMP_DIR/folder" ]]
 printf 'folder content' > "$TMP_DIR/folder/inside.txt"
@@ -42,7 +46,7 @@ import os
 
 rows = json.loads(os.environ["LISTING_JSON"])
 by_name = {row["name"]: row for row in rows}
-assert by_name["file.txt"]["size"] == 11
+assert by_name["file.txt"]["size"] == 15
 assert by_name["folder"]["size"] is None
 PY
 folder_size="$(bash sh/file_manager.sh get_stat "$TMP_DIR/folder" | python3 -c 'import json, sys; print(json.load(sys.stdin)["size"])')"

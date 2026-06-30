@@ -63,6 +63,18 @@ create_dir() {
   echo "Created folder: $path"
 }
 
+save_file_from_temp() {
+  local temp_path="$1"
+  local target_path="$2"
+  validate_path_exists "$temp_path"
+  validate_path_exists "$target_path"
+  [[ -f "$target_path" ]] || error_exit "Choose a regular file to edit."
+  cp -- "$temp_path" "$target_path"
+  rm -f -- "$temp_path"
+  log_action "file.save_file" "succeeded" "$target_path"
+  echo "Saved file: $target_path"
+}
+
 delete_path() {
   local path="$1"
   validate_safe_delete_path "$path"
@@ -273,6 +285,7 @@ shift || true
 case "$ACTION" in
   create_file) create_file "${1:-}" ;;
   create_dir) create_dir "${1:-}" ;;
+  save_file_from_temp) save_file_from_temp "${1:-}" "${2:-}" ;;
   delete_path) delete_path "${1:-}" ;;
   rename_path) rename_path "${1:-}" "${2:-}" ;;
   copy_path) copy_path "${1:-}" "${2:-}" ;;

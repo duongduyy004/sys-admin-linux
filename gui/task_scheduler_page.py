@@ -158,8 +158,8 @@ class ScheduledTaskDialog(tk.Toplevel):
         self.title(self.app.tr("Add Scheduled Task"))
         self.transient(parent)
         self.grab_set()
-        self.geometry("700x560")
-        self.minsize(640, 520)
+        self.geometry("700x640")
+        self.minsize(640, 620)
         self.result: dict[str, str] | None = None
 
         self.name_var = tk.StringVar(value=self.app.tr("My scheduled task"))
@@ -516,7 +516,7 @@ class TaskSchedulerPage(ttk.Frame):
         def done(result: ShellResult) -> None:
             self.after(0, lambda: self._finish(progress, title, action, result, on_success, show_output))
 
-        run_shell_async("task_scheduler.sh", action, args, False, done)
+        run_shell_async("task_scheduler.sh", action, args, False, done, timeout_seconds=20)
 
     def _finish(self, progress: ProgressDialog, title: str, action: str, result: ShellResult, on_success, show_output: bool) -> None:
         progress.finish(result.success, result.stdout, result.stderr, show_output=show_output)
@@ -557,7 +557,14 @@ class TaskSchedulerPage(ttk.Frame):
         if show_progress:
             self.run_action(self.app.tr("Load scheduled tasks"), "list_cron_jobs", [], populate, show_output=False)
         else:
-            run_shell_async("task_scheduler.sh", "list_cron_jobs", [], False, lambda result: self.after(0, lambda: populate(result)))
+            run_shell_async(
+                "task_scheduler.sh",
+                "list_cron_jobs",
+                [],
+                False,
+                lambda result: self.after(0, lambda: populate(result)),
+                timeout_seconds=20,
+            )
 
     def add_task(self) -> None:
         dialog = ScheduledTaskDialog(self, self.app)
@@ -640,6 +647,7 @@ class TaskSchedulerPage(ttk.Frame):
                 ],
                 False,
                 lambda result: self.after(0, lambda: after_expr(result)),
+                timeout_seconds=10,
             )
 
     def remove_task(self) -> None:

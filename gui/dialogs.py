@@ -320,6 +320,8 @@ def friendly_error_message(stderr: str) -> str:
         return tr("That system folder is protected, so nothing was deleted.")
     if "required command is not available" in lower or "command not found" in lower:
         return tr("A required system tool is missing. Install the missing dependency, then try again.")
+    if "command timed out after" in lower:
+        return tr("The system command took too long and was stopped. Please try again, or check whether the scheduler service is available.")
     if "unsupported archive" in lower or "not a zip file" in lower or "gzip" in lower:
         return tr("The archive could not be opened. Check that the file type matches the selected archive format.")
     if "cancelled" in lower or "canceled" in lower or "dismissed" in lower:

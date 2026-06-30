@@ -343,6 +343,9 @@ class PackageManagerPage(ttk.Frame):
 
     def search_packages(self) -> None:
         query = self.search_var.get().strip()
+        if not query:
+            self.list_installed()
+            return
         self.last_loaded_action = "search_packages"
         self.last_search_query = query
         self.run_action(self.app.tr("Search"), "search_packages", [query], lambda result: self.populate(parse_json_output(result.stdout, [])), show_output=False)

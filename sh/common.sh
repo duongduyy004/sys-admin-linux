@@ -10,6 +10,10 @@ resolve_log_file() {
       echo "/var/log/admindesk.log"
       return
     fi
+    local user_state_dir="${XDG_STATE_HOME:-$HOME/.local/state}/admindesk"
+    mkdir -p "$user_state_dir" 2>/dev/null || true
+    echo "$user_state_dir/admindesk.log"
+    return
   fi
   mkdir -p "$PROJECT_DIR/logs"
   echo "$PROJECT_DIR/logs/admindesk.log"

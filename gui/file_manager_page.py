@@ -1,5 +1,6 @@
 import os
 import re
+import tempfile
 import threading
 from pathlib import Path
 import tkinter as tk
@@ -104,6 +105,63 @@ class FilePreviewWindow(tk.Toplevel):
         self.text.configure(state="disabled")
 
 
+class FileEditWindow(tk.Toplevel):
+    def __init__(self, parent: "FileManagerPage", path: str) -> None:
+        super().__init__(parent)
+        self.parent_page = parent
+        self.tr = parent.app.tr
+        self.path = path
+        self.title(self.tr("Edit File: {name}", name=Path(path).name))
+        self.geometry("820x580")
+        self.minsize(620, 420)
+        self.transient(parent)
+
+        body = ttk.Frame(self, padding=14)
+        body.pack(fill="both", expand=True)
+
+        ttk.Label(body, text=Path(path).name, style="Header.TLabel").pack(anchor="w")
+        ttk.Label(body, text=path, style="Subtitle.TLabel", wraplength=760).pack(anchor="w", pady=(2, 10))
+
+        self.message_var = tk.StringVar(value=self.tr("Loading file..."))
+        ttk.Label(body, textvariable=self.message_var, style="Subtitle.TLabel").pack(anchor="w", pady=(0, 8))
+
+        text_frame = ttk.Frame(body)
+        text_frame.pack(fill="both", expand=True)
+        self.text = tk.Text(text_frame, wrap="none", undo=True)
+        yscroll = ttk.Scrollbar(text_frame, orient="vertical", command=self.text.yview)
+        xscroll = ttk.Scrollbar(text_frame, orient="horizontal", command=self.text.xview)
+        self.text.configure(yscrollcommand=yscroll.set, xscrollcommand=xscroll.set, state="disabled")
+        self.text.grid(row=0, column=0, sticky="nsew")
+        yscroll.grid(row=0, column=1, sticky="ns")
+        xscroll.grid(row=1, column=0, sticky="ew")
+        text_frame.rowconfigure(0, weight=1)
+        text_frame.columnconfigure(0, weight=1)
+
+        buttons = ttk.Frame(body)
+        buttons.pack(fill="x", pady=(10, 0))
+        ttk.Button(buttons, text=self.tr("Close"), command=self.destroy).pack(side="right", padx=(8, 0))
+        self.save_button = ttk.Button(buttons, text=self.tr("Save"), command=self.save, style="Accent.TButton", state="disabled")
+        self.save_button.pack(side="right")
+
+    def set_content(self, message: str, content: str = "", editable: bool = False) -> None:
+        self.message_var.set(message)
+        self.text.configure(state="normal")
+        self.text.delete("1.0", "end")
+        if content:
+            self.text.insert("1.0", content)
+        self.text.edit_reset()
+        self.text.configure(state="normal" if editable else "disabled")
+        self.save_button.configure(state="normal" if editable else "disabled")
+
+    def save(self) -> None:
+        content = self.text.get("1.0", "end-1c")
+        self.parent_page.save_file_content(self.path, content, self)
+
+    def mark_saved(self) -> None:
+        self.message_var.set(self.tr("Saved."))
+        self.text.edit_modified(False)
+
+
 class FileManagerPage(ttk.Frame):
     def __init__(self, parent: tk.Widget, app) -> None:
         super().__init__(parent, style="Page.TFrame", padding=18)
@@ -179,17 +237,18 @@ class FileManagerPage(ttk.Frame):
         self._button(create_group, f"📄  {self.app.tr('New File')}", self.create_file).grid(row=0, column=0, sticky="ew", padx=3, pady=3)
         self._button(create_group, f"📁  {self.app.tr('New Folder')}", self.create_folder).grid(row=0, column=1, sticky="ew", padx=3, pady=3)
 
-        self._button(selected_group, f"✎  {self.app.tr('Rename')}", self.rename_item, needs_selection=True).grid(row=0, column=0, sticky="ew", padx=3, pady=3)
-        self._button(selected_group, f"⧉  {self.app.tr('Copy')}", self.copy_item, needs_selection=True).grid(row=0, column=1, sticky="ew", padx=3, pady=3)
-        self._button(selected_group, f"✂  {self.app.tr('Cut')}", self.cut_item, needs_selection=True).grid(row=0, column=2, sticky="ew", padx=3, pady=3)
-        self._button(selected_group, f"ⓘ  {self.app.tr('Details')}", self.details_item, needs_selection=True).grid(row=1, column=0, sticky="ew", padx=3, pady=3)
-        self._button(selected_group, f"🛡  {self.app.tr('Change Permissions')}", self.permissions, needs_selection=True).grid(row=1, column=1, sticky="ew", padx=3, pady=3)
+        self._button(selected_group, f"✎  {self.app.tr('Edit')}", self.edit_file, needs_selection=True).grid(row=0, column=0, sticky="ew", padx=3, pady=3)
+        self._button(selected_group, f"↧  {self.app.tr('Rename')}", self.rename_item, needs_selection=True).grid(row=0, column=1, sticky="ew", padx=3, pady=3)
+        self._button(selected_group, f"⧉  {self.app.tr('Copy')}", self.copy_item, needs_selection=True).grid(row=0, column=2, sticky="ew", padx=3, pady=3)
+        self._button(selected_group, f"✂  {self.app.tr('Cut')}", self.cut_item, needs_selection=True).grid(row=1, column=0, sticky="ew", padx=3, pady=3)
+        self._button(selected_group, f"ⓘ  {self.app.tr('Details')}", self.details_item, needs_selection=True).grid(row=1, column=1, sticky="ew", padx=3, pady=3)
+        self._button(selected_group, f"🛡  {self.app.tr('Change Permissions')}", self.permissions, needs_selection=True).grid(row=1, column=2, sticky="ew", padx=3, pady=3)
         self.paste_button = self._button(selected_group, f"📋  {self.app.tr('Paste')}", self.paste_item)
-        self.paste_button.grid(row=1, column=2, sticky="ew", padx=3, pady=3)
+        self.paste_button.grid(row=2, column=0, sticky="ew", padx=3, pady=3)
         self._button(selected_group, f"🗑  {self.app.tr('Delete')}", self.delete_item, needs_selection=True, style="Danger.TButton").grid(
             row=2,
-            column=0,
-            columnspan=3,
+            column=1,
+            columnspan=2,
             sticky="ew",
             padx=3,
             pady=(3, 0),
@@ -415,6 +474,71 @@ class FileManagerPage(ttk.Frame):
             preview.set_content(message, content)
         self.app.set_status(self.app.tr("Preview opened: {path}", path=path))
 
+    def edit_file(self) -> None:
+        selected = self.require_selected_path()
+        if not selected or not self.validate_path(selected, must_exist=True):
+            return
+        if self.selected_type() != "file" or not Path(selected).is_file():
+            messagebox.showwarning(self.app.tr("Choose a file"), self.app.tr("Choose a regular file to edit."), parent=self)
+            return
+
+        editor = FileEditWindow(self, selected)
+        self.app.set_status(self.app.tr("Opening editor: {path}", path=selected))
+
+        def worker() -> None:
+            message, content, editable = self.load_edit_content(selected)
+            self.after(0, lambda: self.show_edit_content(editor, selected, message, content, editable))
+
+        threading.Thread(target=worker, daemon=True).start()
+
+    def load_edit_content(self, path: str) -> tuple[str, str, bool]:
+        try:
+            file_path = Path(path)
+            size = file_path.stat().st_size
+            with file_path.open("rb") as handle:
+                data = handle.read(MAX_PREVIEW_BYTES + 1)
+        except PermissionError:
+            return self.app.tr("You do not have permission to edit this file."), "", False
+        except FileNotFoundError:
+            return self.app.tr("This file no longer exists. Refresh and try again."), "", False
+        except OSError as exc:
+            return self.app.tr("Unable to edit this file: {error}", error=str(exc)), "", False
+
+        if len(data) > MAX_PREVIEW_BYTES:
+            return self.app.tr("This file is too large to edit here. Size: {size}.", size=format_size(size)), "", False
+        if b"\x00" in data:
+            return self.app.tr("Binary files cannot be edited here. Size: {size}.", size=format_size(size)), "", False
+        try:
+            content = data.decode("utf-8")
+        except UnicodeDecodeError:
+            try:
+                content = data.decode("latin-1")
+            except UnicodeDecodeError:
+                return self.app.tr("This file encoding cannot be edited here. Size: {size}.", size=format_size(size)), "", False
+        return self.app.tr("Editing text file. Size: {size}.", size=format_size(size)), content, True
+
+    def show_edit_content(self, editor: FileEditWindow, path: str, message: str, content: str, editable: bool) -> None:
+        if editor.winfo_exists():
+            editor.set_content(message, content, editable)
+        self.app.set_status(self.app.tr("Editor opened: {path}", path=path))
+
+    def save_file_content(self, path: str, content: str, editor: FileEditWindow) -> None:
+        if not self.validate_path(path, must_exist=True) or not Path(path).is_file():
+            return
+        try:
+            with tempfile.NamedTemporaryFile("w", encoding="utf-8", newline="", delete=False, dir="/tmp") as handle:
+                handle.write(content)
+                temp_path = handle.name
+        except OSError as exc:
+            messagebox.showerror(self.app.tr("Save failed"), self.app.tr("Unable to prepare file content: {error}", error=str(exc)), parent=self)
+            return
+
+        def finish(_result: ShellResult) -> None:
+            editor.mark_saved()
+            self.refresh_folder(show_progress=False)
+
+        self.run_action(self.app.tr("Save File"), "save_file_from_temp", [temp_path, path], on_success=finish)
+
     def update_path_warning(self) -> None:
         folder = self.folder_var.get().strip()
         if folder and is_inside_protected_area(folder):
@@ -452,6 +576,17 @@ class FileManagerPage(ttk.Frame):
             messagebox.showwarning(self.app.tr("Already exists"), self.app.tr("A file or folder already exists there. Choose a different name."), parent=self)
             return False
         return True
+
+    def destination_from_name(self, name: str, label: str) -> str:
+        clean_name = name.strip()
+        if not clean_name or clean_name in {".", ".."} or "/" in clean_name:
+            messagebox.showwarning(self.app.tr("Invalid name"), self.app.tr("Choose a valid {label}.", label=label.lower()), parent=self)
+            return ""
+        folder = self.folder_var.get().strip() or self.current_folder
+        if not self.validate_path(folder, must_exist=True) or not Path(folder).is_dir():
+            messagebox.showwarning(self.app.tr("Choose a folder"), self.app.tr("The current path must be a folder."), parent=self)
+            return ""
+        return str(Path(folder) / clean_name)
 
     def run_action(
         self,
@@ -586,19 +721,23 @@ class FileManagerPage(ttk.Frame):
         values = ask_form(
             self,
             self.app.tr("Create New File"),
-            [{"key": "path", "label": self.app.tr("New file path"), "value": os.path.join(self.folder_var.get(), "new-file.txt")}],
+            [{"key": "name", "label": self.app.tr("New file name"), "value": "new-file.txt"}],
         )
-        if values and self.validate_destination(values["path"], "file path"):
-            self.run_action(self.app.tr("Create New File"), "create_file", [values["path"]])
+        if values:
+            path = self.destination_from_name(values["name"], "file name")
+            if path and self.validate_destination(path, "file name"):
+                self.run_action(self.app.tr("Create New File"), "create_file", [path])
 
     def create_folder(self) -> None:
         values = ask_form(
             self,
             self.app.tr("Create New Folder"),
-            [{"key": "path", "label": self.app.tr("New folder path"), "value": os.path.join(self.folder_var.get(), self.app.tr("New Folder"))}],
+            [{"key": "name", "label": self.app.tr("New folder name"), "value": self.app.tr("New Folder")}],
         )
-        if values and self.validate_destination(values["path"], "folder path"):
-            self.run_action(self.app.tr("Create New Folder"), "create_dir", [values["path"]])
+        if values:
+            path = self.destination_from_name(values["name"], "folder name")
+            if path and self.validate_destination(path, "folder name"):
+                self.run_action(self.app.tr("Create New Folder"), "create_dir", [path])
 
     def delete_item(self) -> None:
         selected = self.require_selected_path()

@@ -27,7 +27,13 @@ class ShellResult:
     command: list[str]
 
 
-def run_shell(script_name: str, action: str, args: list[str] | None = None, require_root: bool = False) -> tuple[bool, str, str, int]:
+def run_shell(
+    script_name: str,
+    action: str,
+    args: list[str] | None = None,
+    require_root: bool = False,
+    timeout_seconds: int | None = None,
+) -> tuple[bool, str, str, int]:
     """
     Runs a shell backend script safely.
 
@@ -43,13 +49,24 @@ def run_shell(script_name: str, action: str, args: list[str] | None = None, requ
     command = ["bash", str(script_path), action, *(args or [])]
     if require_root:
         command = ["pkexec", *command]
-    result = subprocess.run(
-        command,
-        capture_output=True,
-        text=True,
-        cwd=str(PROJECT_DIR),
-        env=os.environ.copy(),
-    )
+    try:
+        result = subprocess.run(
+            command,
+            capture_output=True,
+            text=True,
+            cwd=str(PROJECT_DIR),
+            env=os.environ.copy(),
+            timeout=timeout_seconds,
+        )
+    except subprocess.TimeoutExpired as exc:
+        stdout = exc.stdout or ""
+        stderr = exc.stderr or ""
+        timeout_message = f"Command timed out after {timeout_seconds} seconds: {' '.join(command)}"
+        if stderr:
+            stderr = f"{stderr}\n{timeout_message}"
+        else:
+            stderr = timeout_message
+        return False, stdout, stderr, 124
     return result.returncode == 0, result.stdout, result.stderr, result.returncode
 
 
@@ -59,6 +76,7 @@ def run_shell_async(
     args: list[str] | None,
     require_root: bool,
     on_done: Callable[[ShellResult], None],
+    timeout_seconds: int | None = None,
 ) -> None:
     script_path = SH_DIR / script_name
     command = ["bash", str(script_path), action, *(args or [])]
@@ -66,7 +84,7 @@ def run_shell_async(
         command = ["pkexec", *command]
 
     def worker() -> None:
-        success, stdout, stderr, returncode = run_shell(script_name, action, args, require_root)
+        success, stdout, stderr, returncode = run_shell(script_name, action, args, require_root, timeout_seconds)
         result = ShellResult(success, stdout, stderr, returncode, command)
         on_done(result)
 
